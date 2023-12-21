@@ -1,0 +1,61 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+>
+    <Dialog
+        class="sapUiContentPadding"
+        title="{i18n>workOrder}"
+        contentWidth="30%"
+    >
+        <content>
+            <Table id="idWorkOrderTable" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingThreshold="50" growingScrollToLoad="true"
+            items="{
+			path: 'valueHelp>/workOrder',
+			sorter: {
+				path: 'Name'
+			}
+		}">
+                <headerToolbar>
+			<OverflowToolbar>
+				<content>
+					<SearchField search="onSearchWorkOrder" liveChange="onSearchWorkOrder"></SearchField>
+					<ToolbarSpacer />
+				</content>
+			</OverflowToolbar>
+		</headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>id}"  />
+                    </Column>   
+                    <Column>
+                        <Text text="{i18n>name}"  />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>desc}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" press="onSelectWorkOrder">
+                        <cells>
+                            <Text text="{valueHelp>ID}"></Text>
+                            <Text text="{valueHelp>Name}" />
+                            <Text text="{valueHelp>Description}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    type="Negative"
+                    text="Close"
+                    press="oWorkOrderF4HelpCancel"
+                />
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

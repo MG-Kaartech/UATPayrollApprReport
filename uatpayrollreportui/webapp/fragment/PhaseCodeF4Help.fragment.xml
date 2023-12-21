@@ -1,0 +1,61 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+>
+    <Dialog
+        class="sapUiContentPadding"
+        title="{i18n>phaseCode}"
+        contentWidth="30%"
+    >
+        <content>
+            <Table id="idPhaseCodeTable" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingThreshold="50" growingScrollToLoad="true"
+            items="{
+			path: 'valueHelp>/phase',
+			sorter: {
+				path: 'Name'
+			}
+		}">
+                <headerToolbar>
+			<OverflowToolbar>
+				<content>
+					<SearchField search="onSearchPhase" liveChange="onSearchPhase"></SearchField>
+					<ToolbarSpacer />
+				</content>
+			</OverflowToolbar>
+		</headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>id}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>name}"  />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>desc}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" press="onSelectPhase">
+                        <cells>
+                            <Text text="{valueHelp>ID}"/>
+                            <Text text="{valueHelp>Name}" />
+                            <Text text="{valueHelp>Description}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    type="Negative"
+                    text="Close"
+                    press="oPhaseF4HelpCancel"
+                />
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

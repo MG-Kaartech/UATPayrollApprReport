@@ -1,0 +1,104 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:u="sap.ui.unified"
+>
+    <Dialog
+        class="sapUiContentPadding"
+        title="{i18n>import}"
+    >
+        <f:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanXL="5"
+            labelSpanL="5"
+            labelSpanM="5"
+            labelSpanS="12"
+            adjustLabelSpan="false"
+            emptySpanXL="4"
+            emptySpanL="4"
+            emptySpanM="4"
+            emptySpanS="0"
+            columnsXL="1"
+            columnsL="1"
+            columnsM="1"
+            singleContainerFullSize="false"
+        >
+            <f:content>
+                <u:FileUploader
+                    sameFilenameAllowed="true"
+                    iconOnly="false"
+                    buttonOnly="false"
+                    fileType="XLSX,xlsx"
+                    icon="sap-icon://upload"
+                    iconFirst="true"
+                    style="Emphasized"
+                    change="onUpload"
+                />
+            </f:content>
+        </f:SimpleForm>
+        <content>
+            <Table
+                id="idImportHolidays"
+                mode="MultiSelect"
+                items="{localModel>/items}"
+            >
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <ToolbarSpacer />
+                        <Link
+                            text="{i18n>template}"
+                            press="ExportHoliday"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Label text="{i18n>empName}" />
+                    </Column>
+                    <Column>
+                        <Label text="{i18n>empId}" />
+                    </Column>
+                    <Column>
+                        <Label text="{i18n>payCode}" />
+                    </Column>
+                    <Column>
+                        <Label text="{i18n>date}" />
+                    </Column>
+                    <Column>
+                        <Label text="{i18n>average}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{localModel>EmployeeName}" />
+                            <Text text="{localModel>EmployeeID}" />
+                            <Text text="{localModel>PayCode}" />
+                            <Text text="{localModel>Date}" />
+                            <Text text="{localModel>TotalHours}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    icon="sap-icon://validate"
+                    text="{i18n>approve}"
+                    type="Success"
+                    press="timeSheetApprove"
+                />
+                <Button
+                    type="Negative"
+                    text="{i18n>cancel}"
+                    press="importDialogClose"
+                />
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>

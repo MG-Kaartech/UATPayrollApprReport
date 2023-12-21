@@ -1,0 +1,57 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+>
+    <Dialog
+        class="sapUiContentPadding"
+        title="{i18n>activity}"
+        contentWidth="30%"
+    >
+        <content>
+            <Table id="idActivityTable" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingThreshold="50" growingScrollToLoad="true"
+            items="{
+			path: 'valueHelp>/activities',
+			sorter: {
+				path: 'Name'
+			}
+		}">
+                <headerToolbar>
+			<OverflowToolbar>
+				<content>
+					<SearchField search="onSearchActivity" liveChange="onSearchActivity"></SearchField>
+					<ToolbarSpacer />
+				</content>
+			</OverflowToolbar>
+		</headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>id}"  />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>name}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" press="onSelectActivity">
+                        <cells>
+                            <Text text="{valueHelp>ActivityID}" />
+                            <Text text="{valueHelp>ActivityName}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    type="Negative"
+                    text="Close"
+                    press="oActivityF4HelpCancel"
+                />
+            </OverflowToolbar>
+        </footer>
+    </Dialog>
+</core:FragmentDefinition>
