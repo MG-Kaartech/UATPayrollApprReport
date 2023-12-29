@@ -69,7 +69,8 @@ sap.ui.define([
                 var batchOperation5 = oSFDataModel.createBatchOperation("/FOCompany?$format=json", "GET");
                 var batchOperation6 = oSFDataModel.createBatchOperation("/cust_paycode?$format=json", "GET");
                 var batchOperation7 = oSFDataModel.createBatchOperation("/PayPeriod?$filter=PayCalendar_payGroup eq 'MGBWLY'&$format=JSON", "GET");
-                var sfBatchArray = [batchOperation4, batchOperation5, batchOperation6, batchOperation7];
+                var batchOperation8 = oSFDataModel.createBatchOperation("/cust_allowance?$format=json", "GET");
+                var sfBatchArray = [batchOperation4, batchOperation5, batchOperation6, batchOperation7, batchOperation8];
                 oSFDataModel.addBatchReadOperations(sfBatchArray);
                 oSFDataModel.submitBatch(function (oResult) {
                     console.log(oResult)
@@ -91,6 +92,9 @@ sap.ui.define([
                     } catch (err) { }
                     try {
                         this.getView().getModel("valueHelp").setProperty("/payperiod", oResult.__batchResponses[3].data.results);
+                    } catch (err) { }
+                    try {
+                        this.getView().getModel("valueHelp").setProperty("/cost_allowance", oResult.__batchResponses[4].data.results);
                     } catch (err) { }
                     sfBatchPromise.resolve();
                     //sap.ui.core.BusyIndicator.hide();
@@ -199,13 +203,32 @@ sap.ui.define([
                                 sEndDate = sEndDate >= 10 ? sEndDate : "0" + sEndDate;
                                 var sBeginDateVal = sBeginYear + "-" + sBeginMonth + "-" + sBeginDate;
                                 var sEndDateVal = sEndYear + "-" + sEndMonth + "-" + sEndDate;
+                                var PayPeriodBeginDate = new sap.ui.model.Filter({
+                                    path: "PayPeriodBeginDate",
+                                    operator: sap.ui.model.FilterOperator.EQ,
+                                    value1: sBeginDateVal
+                                });
+                                oFilterValues.push(PayPeriodBeginDate);
+                                var PayPeriodEndDate = new sap.ui.model.Filter({
+                                    path: "PayPeriodEndDate",
+                                    operator: sap.ui.model.FilterOperator.EQ,
+                                    value1: sEndDateVal
+                                });
+                                oFilterValues.push(PayPeriodEndDate);
                                 break;
                             }
                         }
                     }
                     else {
-                        sBeginDateVal = this.getView().byId("idStartDate").getValue();
-                        sEndDateVal = this.getView().byId("idFinishDate").getValue();
+                        var sBeginDateVal = this.getView().byId("idStartDate").getValue();
+                        var sEndDateVal = this.getView().byId("idFinishDate").getValue();
+                        var DateRange = new sap.ui.model.Filter({
+                            path: "Date",
+                            operator: sap.ui.model.FilterOperator.BT,
+                            value1: sBeginDateVal,
+                            value2: sEndDateVal
+                        });
+                        oFilterValues.push(DateRange);
                     }
                     var DateRange = new sap.ui.model.Filter({
                         path: "Date",
@@ -1414,6 +1437,7 @@ sap.ui.define([
                 }
                 sap.ui.core.BusyIndicator.show(-1);
                 var oPayCodeList = this.getView().getModel("valueHelp").getData().paycodeall;
+                var oCost_allowance = this.getView().getModel("valueHelp").getData().cost_allowance;
                 var cpiPayload = [];
                 for (var i = 0; i < selectedValues.length; i++) {
                     var oSelectedData = this.getView().getModel("payroll").getProperty(selectedValues[i]);
@@ -1427,7 +1451,22 @@ sap.ui.define([
                                 obj.EmployeeNumber = this.completeResponse[j].EmployeeID;
                                 obj.Date = date.replaceAll("-", "");
                                 obj.WageType = wagetype;
+                                this.completeResponse[j].TotalHours = this.completeResponse[j].TotalHours.replaceAll(":", ".");
                                 obj.Amount = "";
+                                for(var i=0;i<oCost_allowance.length;i++){
+                                    if(oCost_allowance[i].cust_paycodeID == wagetype && (oCost_allowance[i].cust_Location !== null && oCost_allowance[i].cust_Location == this.completeResponse[j].LocationCode) && (oCost_allowance[i].cust_profitCenter !== null  && oCost_allowance[i].cust_profitCenter == this.completeResponse[j].ProfitCenter) ){
+                                        obj.Amount = Number(oCost_allowance[i].cust_Amount) * Number(this.completeResponse[j].TotalHours);
+                                        break;
+                                    }
+                                    else if(oCost_allowance[i].cust_paycodeID == wagetype && oCost_allowance[i].cust_Location == this.completeResponse[j].LocationCode){
+                                        obj.Amount = Number(oCost_allowance[i].cust_Amount) * Number(this.completeResponse[j].TotalHours);
+                                        break;
+                                    }
+                                    else if(oCost_allowance[i].cust_paycodeID == wagetype){
+                                        obj.Amount = Number(oCost_allowance[i].cust_Amount) * Number(this.completeResponse[j].TotalHours);
+                                        break;
+                                    }
+                                }
                                 obj.Number = this.completeResponse[j].TotalHours.replaceAll(":", ".");
                                 if (obj.WageType == "1000" || obj.WageType == "1090") {
                                     obj.Unit = "Hours";
@@ -1450,6 +1489,9 @@ sap.ui.define([
                                 }
                                 if (obj.Currency == undefined || obj.Currency == null) {
                                     obj.Currency = "";
+                                }
+                                if(obj.Unit == "Amount"){
+                                    obj.Number = "";
                                 }
                                 obj.CostCenter = this.completeResponse[j].CostCenter;
                                 obj.CompanyCodeCostCenter = this.completeResponse[j].CompanyID;

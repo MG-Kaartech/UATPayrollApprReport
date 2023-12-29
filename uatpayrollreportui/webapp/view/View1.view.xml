@@ -34,7 +34,13 @@
                         <ComboBox
                             id="idPayPeriodComboBox"
                             placeholder="{i18n>select}"
-                            items="{valueHelp>/payperiod}" change="onChangePayPeriod"
+                            items="{
+			                    path: 'valueHelp>/payperiod',
+			                    sorter: {
+				                        path: 'processingRunId'
+			                        }
+		                        }"
+                            change="onChangePayPeriod"
                         >
                             <items>
                                 <core:Item
@@ -137,7 +143,6 @@
                     name="Start Date"
                     label="{i18n>startDate}"
                     visibleInFilterBar="true"
-                    mandatory="true"
                 >
                     <fb:control>
                         <DatePicker
@@ -153,7 +158,6 @@
                     name="Finish Date"
                     label="{i18n>finishDate}"
                     visibleInFilterBar="true"
-                    mandatory="true"
                 >
                     <fb:control>
                         <DatePicker
