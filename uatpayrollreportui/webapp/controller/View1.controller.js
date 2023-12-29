@@ -142,8 +142,8 @@ sap.ui.define([
                     success: function (odata) {
                         console.log(odata);
                         try {
-                            this.loginName = odata.results[0].FirstName
-                            this.logedinEmail = odata.results[0].Email
+                            this.loginName = odata.results[0].FirstName + " " + odata.results[0].LastName;
+                            this.logedinEmail = odata.results[0].Email;
                         } catch (err) {
                             this.loginName = "";
                             this.logedinEmail = "";
@@ -415,6 +415,8 @@ sap.ui.define([
                 }
             },
             onChangeResource: function (oEvent) {
+                oEvent.getSource().setValue("");
+                MessageToast.show(this.getResourceBundle().getText("selectF4"));
                 if (oEvent.getSource().getValue() == "") {
                     this.selectedRes = "";
                 }
@@ -577,7 +579,7 @@ sap.ui.define([
                 this.oCostCenterF4HelpCancel();
                 this.UpdateIndicatorValue(oEvent, this.oSelectedCostCenterPath); // update indicator with X for approved objects
             },
-            /// filter activity 
+            // filter activity 
             onSearchActivity: function (oEvent) {
                 var sQuery = oEvent.getSource().getValue();
                 var ActivityID = new sap.ui.model.Filter("ActivityID", sap.ui.model.FilterOperator.Contains, sQuery);
@@ -595,6 +597,30 @@ sap.ui.define([
                 this.getView().getModel("timePeriod").refresh();
                 this.oActivityF4HelpCancel();
                 this.UpdateIndicatorValue(oEvent, this.oSelectedActivityPath); // update indicator with X for approved objects
+            },
+            /// filter payperiod 
+            onSearchPayPeriod: function (oEvent) {
+                var sQuery = oEvent.getSource().getValue();
+                var processingRunId = new sap.ui.model.Filter("processingRunId", sap.ui.model.FilterOperator.Contains, sQuery);
+                var beginDate = new sap.ui.model.Filter("cust_MGCPayPeriodBeginDate", sap.ui.model.FilterOperator.Contains, sQuery);
+                var endDate = new sap.ui.model.Filter("cust_MGCPayPeriodEndDate", sap.ui.model.FilterOperator.Contains, sQuery);
+                var filters = new sap.ui.model.Filter([processingRunId, beginDate, endDate]);
+                var listassign = sap.ui.getCore().byId("idPayPeriodTable");
+                listassign.getBinding("items").filter(filters, "Appliation");
+            },
+            // costcenter activity
+            onSelectPayPeriod: function (oEvent) {
+                var sSelectedPath = oEvent.getSource().getBindingContextPath();
+                var sObj = this.getView().getModel("valueHelp").getProperty(sSelectedPath);
+                this.getView().byId("idPayPeriodComboBox").setValue(sObj.processingRunId);
+                this.oPayPeriodF4HelpCancel();
+                this.getView().byId("idStartDate").setDateValue();
+                this.getView().byId("idFinishDate").setDateValue();
+                this.getView().byId("idStartDate").setEnabled(false);
+                this.getView().byId("idFinishDate").setEnabled(false);
+            },
+            oPayPeriodF4HelpCancel: function () {
+                this.PayPeriodF4Help.close();
             },
             importDialogClose: function (OEvent) {
                 this._oImportHolidayDialog.close();
@@ -625,6 +651,20 @@ sap.ui.define([
                     }.bind(this));
                 } else {
                     this.CompanyF4Help.open();
+                }
+            },
+            onPayPeriodF4: function () {
+                if (!this.PayPeriodF4Help) {
+                    Fragment.load({
+                        name: "com.mgc.uatpayrollreportui.fragment.PayPeriodF4Help",
+                        controller: this
+                    }).then(function (oDialog) {
+                        this.PayPeriodF4Help = oDialog;
+                        this.getView().addDependent(oDialog);
+                        this.PayPeriodF4Help.open();
+                    }.bind(this));
+                } else {
+                    this.PayPeriodF4Help.open();
                 }
             },
             onJobF4: function (oEvent) {
@@ -723,11 +763,11 @@ sap.ui.define([
             onActivityF4: function (oEvent) {
                 this.oSelectedActivityPath = oEvent.getSource().getParent().getBindingContextPath();
                 var selectedData = this.getView().getModel("timePeriod").getProperty(this.oSelectedActivityPath);
-                if (selectedData.CostCenter == "" || selectedData.CostCenter == null) {
+                /*if (selectedData.CostCenter == "" || selectedData.CostCenter == null) {
                     selectedData.CostCenterState = "Error";
                     MessageBox.error(this.getResourceBundle().getText("errorSelectCostCenter"));
                     return;
-                }
+                }*/
                 if (!this.ActivityF4Help) {
                     Fragment.load({
                         name: "com.mgc.uatpayrollreportui.fragment.ActivityF4Help",
@@ -1058,27 +1098,19 @@ sap.ui.define([
                 oEvent.getSource().setValue("");
                 MessageToast.show(this.getResourceBundle().getText("selectF4"));
             },
-            onChangePayPeriod: function (oEvent) {
-                var oValidatedComboBox = oEvent.getSource(),
-                    sSelectedKey = oValidatedComboBox.getSelectedKey(),
-                    sValue = oValidatedComboBox.getValue();
-                if (!sSelectedKey && sValue) {
-                    oValidatedComboBox.setValueState(ValueState.Error);
-                    oEvent.getSource().setValue("");
-                    MessageToast.show(this.getResourceBundle().getText("selectComboBox"));
+            onChangePayPeriodF4Help:function(oEvent){
+                var sSelectedKey = this.getView().byId("idPayPeriodComboBox").getValue();
+                oEvent.getSource().setValue("");
+                MessageToast.show(this.getResourceBundle().getText("selectF4"));
+                if (sSelectedKey == "") {
+                    this.getView().byId("idStartDate").setEnabled(true);
+                    this.getView().byId("idFinishDate").setEnabled(true);
                 }
                 else {
-                    if (sSelectedKey == "") {
-                        this.getView().byId("idStartDate").setEnabled(true);
-                        this.getView().byId("idFinishDate").setEnabled(true);
-                    }
-                    else {
-                        this.getView().byId("idStartDate").setDateValue();
-                        this.getView().byId("idFinishDate").setDateValue();
-                        this.getView().byId("idStartDate").setEnabled(false);
-                        this.getView().byId("idFinishDate").setEnabled(false);
-                    }
-                    oValidatedComboBox.setValueState(ValueState.None);
+                    this.getView().byId("idStartDate").setDateValue();
+                    this.getView().byId("idFinishDate").setDateValue();
+                    this.getView().byId("idStartDate").setEnabled(false);
+                    this.getView().byId("idFinishDate").setEnabled(false);
                 }
             },
             onChangeComboBox: function (oEvent) {
@@ -1156,7 +1188,7 @@ sap.ui.define([
                         this.vacationLeaveEntered = true;
                     }
 
-                    if (oModelData[i].PayCode == "" && oModelData[i].CostCenter == "" && oModelData[i].WorkOrder == "" && oModelData[i].Job == "") {
+                    if (oModelData[i].Activity == "" && oModelData[i].CostCenter == "" && oModelData[i].WorkOrder == "" && oModelData[i].Job == "") {
                         MessageBox.error(this.getResourceBundle().getText("errorWBS"));
                         this.getView().getModel("timePeriod").refresh();
                         sap.ui.getCore().byId("idSave").setEnabled(false);
@@ -1453,16 +1485,16 @@ sap.ui.define([
                                 obj.WageType = wagetype;
                                 this.completeResponse[j].TotalHours = this.completeResponse[j].TotalHours.replaceAll(":", ".");
                                 obj.Amount = "";
-                                for(var i=0;i<oCost_allowance.length;i++){
-                                    if(oCost_allowance[i].cust_paycodeID == wagetype && (oCost_allowance[i].cust_Location !== null && oCost_allowance[i].cust_Location == this.completeResponse[j].LocationCode) && (oCost_allowance[i].cust_profitCenter !== null  && oCost_allowance[i].cust_profitCenter == this.completeResponse[j].ProfitCenter) ){
+                                for (var i = 0; i < oCost_allowance.length; i++) {
+                                    if (oCost_allowance[i].cust_paycodeID == wagetype && (oCost_allowance[i].cust_Location !== null && oCost_allowance[i].cust_Location == this.completeResponse[j].LocationCode) && (oCost_allowance[i].cust_profitCenter !== null && oCost_allowance[i].cust_profitCenter == this.completeResponse[j].ProfitCenter)) {
                                         obj.Amount = Number(oCost_allowance[i].cust_Amount) * Number(this.completeResponse[j].TotalHours);
                                         break;
                                     }
-                                    else if(oCost_allowance[i].cust_paycodeID == wagetype && oCost_allowance[i].cust_Location == this.completeResponse[j].LocationCode){
+                                    else if (oCost_allowance[i].cust_paycodeID == wagetype && oCost_allowance[i].cust_Location == this.completeResponse[j].LocationCode) {
                                         obj.Amount = Number(oCost_allowance[i].cust_Amount) * Number(this.completeResponse[j].TotalHours);
                                         break;
                                     }
-                                    else if(oCost_allowance[i].cust_paycodeID == wagetype){
+                                    else if (oCost_allowance[i].cust_paycodeID == wagetype) {
                                         obj.Amount = Number(oCost_allowance[i].cust_Amount) * Number(this.completeResponse[j].TotalHours);
                                         break;
                                     }
@@ -1490,7 +1522,7 @@ sap.ui.define([
                                 if (obj.Currency == undefined || obj.Currency == null) {
                                     obj.Currency = "";
                                 }
-                                if(obj.Unit == "Amount"){
+                                if (obj.Unit == "Amount") {
                                     obj.Number = "";
                                 }
                                 obj.CostCenter = this.completeResponse[j].CostCenter;
@@ -1537,7 +1569,7 @@ sap.ui.define([
                             payload.PayPeriodBeginDate = this.completeResponse[j].PayPeriodBeginDate;
                             payload.PayPeriodEndDate = this.completeResponse[j].PayPeriodEndDate;
                             payload.PayrollApprovalStatus = "Executed";
-                            if (payload.SaveSubmitStatus != "Approved") {
+                            if (this.completeResponse[j].SaveSubmitStatus != "Approved") {
                                 payload.SaveSubmitStatus = "Approved";
                                 payload.ManagerApprovalName = this.loginName;
                             }

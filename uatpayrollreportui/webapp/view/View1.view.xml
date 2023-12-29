@@ -31,7 +31,14 @@
                     visibleInFilterBar="true"
                 >
                     <fb:control>
-                        <ComboBox
+                        <Input
+                            id="idPayPeriodComboBox"
+                            placeholder="{i18n>payPeriod}"
+                            showValueHelp="true"
+                            valueHelpRequest="onPayPeriodF4"
+                            change="onChangePayPeriodF4Help"
+                        />
+                        <!--ComboBox
                             id="idPayPeriodComboBox"
                             placeholder="{i18n>select}"
                             items="{
@@ -48,7 +55,7 @@
                                     text="{valueHelp>processingRunId}"
                                 />
                             </items>
-                        </ComboBox>
+                        </ComboBox-->
                     </fb:control>
                 </fb:FilterGroupItem>
                 <fb:FilterGroupItem
@@ -63,6 +70,7 @@
                             placeholder="{i18n>company}"
                             showValueHelp="true"
                             valueHelpRequest="onCompanyF4"
+                            change="onChangeF4Help"
                         />
                     </fb:control>
                 </fb:FilterGroupItem>

@@ -7,7 +7,7 @@
     <Dialog
         class="sapUiContentPadding"
         title="{i18n>workOrder}"
-        contentWidth="30%"
+        contentWidth="40%"
     >
         <content>
             <Table id="idWorkOrderTable" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingThreshold="50" growingScrollToLoad="true"
