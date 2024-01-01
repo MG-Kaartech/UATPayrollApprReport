@@ -230,13 +230,7 @@ sap.ui.define([
                         });
                         oFilterValues.push(DateRange);
                     }
-                    var DateRange = new sap.ui.model.Filter({
-                        path: "Date",
-                        operator: sap.ui.model.FilterOperator.BT,
-                        value1: sBeginDateVal,
-                        value2: sEndDateVal
-                    });
-                    oFilterValues.push(DateRange);
+
                     var resourceValue = this.getView().byId("resourceInput").getValue();
                     resourceValue == "" ? (this.selectedRes = "") : this.selectedRes;
                     if (resourceValue != "" && this.selectedRes != undefined && this.selectedRes != "") {
@@ -927,7 +921,7 @@ sap.ui.define([
                 var Screen1Filters = this.oSelectedFilters();
                 var oFilterValues = [];
                 Screen1Filters.forEach(oItem => {
-                    if (oItem.sPath !== 'Date') {
+                    if (oItem.sPath !== 'Date' && oItem.sPath !== "PayPeriodBeginDate" && oItem.sPath !== "PayPeriodEndDate") {
                         oFilterValues.push(oItem);
                     }
                 })
@@ -942,6 +936,7 @@ sap.ui.define([
                     value1: oFromDateTimePeriod,
                     value2: oEndDateTimePeriod
                 });
+                oFilterValues.push(DateRange);
                 var oName = new sap.ui.model.Filter({
                     path: "EmployeeID",
                     operator: sap.ui.model.FilterOperator.EQ,
@@ -1098,7 +1093,7 @@ sap.ui.define([
                 oEvent.getSource().setValue("");
                 MessageToast.show(this.getResourceBundle().getText("selectF4"));
             },
-            onChangePayPeriodF4Help:function(oEvent){
+            onChangePayPeriodF4Help: function (oEvent) {
                 var sSelectedKey = this.getView().byId("idPayPeriodComboBox").getValue();
                 oEvent.getSource().setValue("");
                 MessageToast.show(this.getResourceBundle().getText("selectF4"));
