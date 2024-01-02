@@ -125,7 +125,7 @@ sap.ui.define([
                     },
                     error: function (e) {
                         //console.log(e);
-                        MessageBox.error(this.getResourceBundle().getText("errorUser"));
+                        MessageBox.error(that.getResourceBundle().getText("errorUser"));
                     }
                 });
             },
