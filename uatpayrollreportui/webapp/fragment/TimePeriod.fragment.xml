@@ -66,9 +66,8 @@
                     id="idTimePeriodTable"
                     items="{timePeriod>/timesheetData}"
                     mode="MultiSelect"
-                    sticky="ColumnHeaders"
-                    inset="false"
-                    growing="true"
+                    sticky="ColumnHeaders,HeaderToolbar"
+                    growing="true" growingThreshold="50" growingScrollToLoad="true"
                     class="timePeriodTable"
                     width="135%"
                 >

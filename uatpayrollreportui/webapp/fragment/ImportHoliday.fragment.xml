@@ -27,7 +27,7 @@
             singleContainerFullSize="false"
         >
             <f:content>
-                <u:FileUploader
+                <u:FileUploader id="idFileUploader"
                     sameFilenameAllowed="true"
                     iconOnly="false"
                     buttonOnly="false"
@@ -50,7 +50,7 @@
                         <ToolbarSpacer />
                         <Link
                             text="{i18n>template}"
-                            press="ExportHoliday"
+                            press="onExportHoliday"
                         />
                     </OverflowToolbar>
                 </headerToolbar>

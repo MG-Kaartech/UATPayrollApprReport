@@ -60,6 +60,24 @@ sap.ui.define([], function () {
 				return "Warning";
 			}
 		},
+		PayrollApprovalStatusText:function(status){
+			var count = 0;
+			if (status == null || status == "") {
+				return "Not Executed";
+			}
+			else {
+				status.split("#").forEach(index => {
+					if (index != 'Executed') {
+						count++;
+					}
+				})
+			}
+			if (count == 0) {
+				return "Executed";
+			} else {
+				return "Not Executed";
+			}
+		},
 		SaveSubmitStatusText: function (status) {
 			var count = 0;
 			if (status == null || status == "") {

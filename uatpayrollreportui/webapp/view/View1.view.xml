@@ -200,13 +200,13 @@
                             icon="sap-icon://download-from-cloud"
                             text="{i18n>export}"
                             type="Ghost"
-                            press="exportTimeData"
+                            press="onExportTimeData"
                         />
                         <Button
                             icon="sap-icon://upload-to-cloud"
                             text="{i18n>import}"
                             type="Emphasized"
-                            press="importHoliday"
+                            press="onPressImportHoliday"
                         />
                     </OverflowToolbar>
                 </headerToolbar>
@@ -260,22 +260,32 @@
                             <Text
                                 text="{payroll>PayPeriodBeginDate} to {payroll>PayPeriodEndDate}"
                             />
-                            <Text
+                            <!--Text
                                 text="{ parts: [ {path: 'payroll>PayCode'},{path: 'payroll>TotalHoursPercentage'} ], formatter: '.formatter.TotalHoursCalculation' }"
-                            />
+                            /-->
+                            <Text text="{payroll>TotalHoursPercentage}" />
                             <Text text="{payroll>RegularTime}" />
                             <Text text="{payroll>OverTime}" />
-                            <Text
+                            <Text text="{payroll>PayCode}" />
+                            <!--Text
                                 text="{ parts: [ {path: 'payroll>PayCode'} ], formatter: '.formatter.PayCodeCount' }"
-                            />
+                            /-->
                             <ObjectNumber
-                                number="{ parts: [ {path: 'payroll>SaveSubmitStatus'} ], formatter: '.formatter.SaveSubmitStatusText' }"
+                                number="{payroll>SaveSubmitStatus}"
                                 state="{ parts: [ {path: 'payroll>SaveSubmitStatus'} ], formatter: '.formatter.StatusValue' }"
                             />
+                            <!--ObjectNumber
+                                number="{ parts: [ {path: 'payroll>SaveSubmitStatus'} ], formatter: '.formatter.SaveSubmitStatusText' }"
+                                state="{ parts: [ {path: 'payroll>SaveSubmitStatus'} ], formatter: '.formatter.StatusValue' }"
+                            /-->
                             <ObjectNumber
-                                number="{ parts: [ {path: 'payroll>PayrollApprovalStatus'} ], formatter: '.formatter.StatusName' }"
+                                number="{payroll>PayrollApprovalStatus}"
                                 state="{ parts: [ {path: 'payroll>PayrollApprovalStatus'} ], formatter: '.formatter.Status' }"
                             />
+                            <!--ObjectNumber
+                                number="{ parts: [ {path: 'payroll>PayrollApprovalStatus'} ], formatter: '.formatter.StatusName' }"
+                                state="{ parts: [ {path: 'payroll>PayrollApprovalStatus'} ], formatter: '.formatter.Status' }"
+                            /-->
                         </cells>
                     </ColumnListItem>
                 </items>
