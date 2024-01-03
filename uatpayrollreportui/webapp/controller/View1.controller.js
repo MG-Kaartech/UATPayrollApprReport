@@ -345,10 +345,10 @@ sap.ui.define([
                                     obj.PayCode = (index == 0 ? oArr.PayCode : (obj.PayCode + "#" + oArr.PayCode));
                                     obj.OtThreshold = oArr.OtThreshold;
                                     obj.EmployeeID = oArr.EmployeeID;
-                                    if (obj.RegularTime > obj.OtThreshold && (obj.OtThreshold != null && obj.OtThreshold != "")) {
+                                    /*if (obj.RegularTime > obj.OtThreshold && (obj.OtThreshold != null && obj.OtThreshold != "")) {
                                         obj.OverTime = obj.RegularTime - obj.OtThreshold;
                                         obj.RegularTime = obj.OtThreshold;
-                                    }
+                                    }*/
                                 });
                                 // push objects if the employee id,emp name,payperiod being date is available
                                 if (obj.EmployeeID !== "" && obj.EmployeeName !== null && obj.PayPeriodBeginDate !== null && obj.PayPeriodBeginDate !== "") {
@@ -1231,6 +1231,7 @@ sap.ui.define([
                 else {
                     num = oItem.TotalHours + ":00";
                 }
+                oItem.TotalHours = num;
                 if (oItem.TotalHours.split(":")[0].length != 2) {
                     oItem.TotalHours = Number(oItem.TotalHours.split(":")[0]) >= 10 ? num : "0" + num;
                 }
@@ -1538,9 +1539,10 @@ sap.ui.define([
                                     cpiPayload.push(obj);
                                 }
                                 if (Number(this.completeResponse[j].RegularTime) != 0) {
-                                    obj.WageType = "1000";
-                                    obj.Number = this.completeResponse[j].RegularTime;
-                                    cpiPayload.push(obj);
+                                    let obj1 = {...obj};
+                                    obj1.WageType = "1000";
+                                    obj1.Number = this.completeResponse[j].RegularTime;
+                                    cpiPayload.push(obj1);
                                 }
                                 if (Number(this.completeResponse[j].OverTime) == 0 && Number(this.completeResponse[j].RegularTime) == 0) {
                                     cpiPayload.push(obj);
