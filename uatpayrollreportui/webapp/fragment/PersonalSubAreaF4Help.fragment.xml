@@ -2,7 +2,6 @@
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core">
 <SelectDialog
-		id="locValueHelpDialog"
 		title="{i18n>location}"
 		items="{
 			path: 'valueHelp>/subarea',
