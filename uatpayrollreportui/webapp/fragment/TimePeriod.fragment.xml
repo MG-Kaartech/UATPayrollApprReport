@@ -4,7 +4,8 @@
     xmlns:l="sap.ui.layout"
     xmlns:f="sap.ui.layout.form"
 >
-    <Dialog id="idTimesheetDialog"
+    <Dialog
+        id="idTimesheetDialog"
         class="sapUiContentPadding"
         contentWidth="100%"
         title="{i18n>timePeriod}"
@@ -50,24 +51,20 @@
                 />
             </Toolbar>
             <ScrollContainer
-                height="100%"
+                height="250px"
                 width="100%"
                 vertical="true"
                 horizontal="true"
                 focusable="false"
             >
-            <!--
-                path: 'timePeriod>/timesheetData',
-			        sorter: {
-				        path: 'Date'
-			            }
-            -->
                 <Table
                     id="idTimePeriodTable"
                     items="{timePeriod>/timesheetData}"
                     mode="MultiSelect"
                     sticky="ColumnHeaders,HeaderToolbar"
-                    growing="true" growingThreshold="50" growingScrollToLoad="true"
+                    growing="true"
+                    growingThreshold="50"
+                    growingScrollToLoad="true"
                     class="timePeriodTable"
                     width="135%"
                 >
@@ -217,7 +214,7 @@
                                 <Input
                                     change="onChangeHours"
                                     value="{timePeriod>TotalHours}"
-                                    valueState = "{timePeriod>TotalHourslueState}"
+                                    valueState="{timePeriod>TotalHourslueState}"
                                     editable="{ parts: [ {path: 'timePeriod>PayCode'},{path: 'timePeriod>TotalHours'} ,{path:'timePeriod>NewRecord'}], formatter: '.formatter.SickEditable' }"
                                 />
                                 <Input

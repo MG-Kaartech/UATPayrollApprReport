@@ -38,24 +38,6 @@
                             valueHelpRequest="onPayPeriodF4"
                             change="onChangePayPeriodF4Help"
                         />
-                        <!--ComboBox
-                            id="idPayPeriodComboBox"
-                            placeholder="{i18n>select}"
-                            items="{
-			                    path: 'valueHelp>/payperiod',
-			                    sorter: {
-				                        path: 'processingRunId'
-			                        }
-		                        }"
-                            change="onChangePayPeriod"
-                        >
-                            <items>
-                                <core:Item
-                                    key="{valueHelp>processingRunId}"
-                                    text="{valueHelp>processingRunId}"
-                                />
-                            </items>
-                        </ComboBox-->
                     </fb:control>
                 </fb:FilterGroupItem>
                 <fb:FilterGroupItem
@@ -173,6 +155,38 @@
                             valueFormat="yyyy-MM-dd"
                             displayFormat="yyyy-MM-dd"
                             placeholder="{i18n>finishDate}"
+                        />
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem
+                    groupName="group1"
+                    name="Personal Subarea"
+                    label="{i18n>personalSubArea}"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <MultiInput
+                            id="idSubarea"
+                            placeholder="{i18n>personalSubArea}"
+                            showValueHelp="true"
+                            valueHelpRequest="onSubAreaF4"
+                            change="onChangeF4Help"
+                        />
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem
+                    groupName="group1"
+                    name="Location"
+                    label="{i18n>location}"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                        <MultiInput
+                            id="idLocation"
+                            placeholder="{i18n>location}"
+                            showValueHelp="true"
+                            valueHelpRequest="onLocationF4"
+                            change="onChangeF4Help"
                         />
                     </fb:control>
                 </fb:FilterGroupItem>
@@ -295,9 +309,14 @@
             <OverflowToolbar>
                 <ToolbarSpacer />
                 <Button
+                    text="{i18n>approve}"
+                    press="onPressApprove"
+                    class="sapUiSmallMarginBeginEnd"
+                />
+                <Button
                     icon="sap-icon://validate"
                     type="Success"
-                    text="{i18n>approve}"
+                    text="{i18n>submitForPayroll}"
                     press="onPressApproveCPI"
                     class="sapUiSmallMarginBeginEnd"
                 />

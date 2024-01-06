@@ -31,3 +31,9 @@
     padding: 5px !important;
     object-fit: cover;
 }
+.sapMOHBottomRow {
+    margin-top: 0rem !important;
+}
+.sapMOHAttrRow {
+    margin-top: 0.2rem !important;
+}

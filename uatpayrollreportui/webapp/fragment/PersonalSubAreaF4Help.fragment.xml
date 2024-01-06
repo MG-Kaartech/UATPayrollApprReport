@@ -1,0 +1,21 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+<SelectDialog
+		id="locValueHelpDialog"
+		title="{i18n>location}"
+		items="{
+			path: 'valueHelp>/subarea',
+			sorter: {
+				path: 'externalCode'
+			}
+		}"
+		search="onSubAreaSearch"
+		confirm="onConfirmSubArea"
+		cancel="onConfirmSubArea"
+		multiSelect="true">
+		<StandardListItem id="idSubareaTable"
+			title="{valueHelp>externalCode}"
+			description="{valueHelp>name}"/>
+	</SelectDialog>
+</core:FragmentDefinition>
