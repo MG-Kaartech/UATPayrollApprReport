@@ -199,33 +199,33 @@ sap.ui.define([
                         var data = this.getView().getModel("valueHelp").getData().payperiod;
                         for (var i = 0; i < data.length; i++) {
                             if (sPayPeriod == data[i].processingRunId) {
-                                if (data[i].payPeriodBeginDate == null || data[i].payPeriodEndDate == null) {
+                                if (data[i].cust_MGCPayPeriodBeginDate == null || data[i].cust_MGCPayPeriodEndDate == null) {
                                     MessageBox.error(this.getResourceBundle().getText("invalidDataForPayPeriod"));
                                     return;
                                 }
-                                var sBeginYear = data[i].payPeriodBeginDate.getFullYear();
-                                var sBeginMonth = data[i].payPeriodBeginDate.getMonth() + 1;
-                                var sBeginDate = data[i].payPeriodBeginDate.getDate();
+                                /*var sBeginYear = data[i].cust_MGCPayPeriodBeginDate.getFullYear();
+                                var sBeginMonth = data[i].cust_MGCPayPeriodBeginDate.getMonth() + 1;
+                                var sBeginDate = data[i].cust_MGCPayPeriodBeginDate.getDate() +1;
                                 sBeginMonth = sBeginMonth >= 10 ? sBeginMonth : "0" + sBeginMonth;
                                 sBeginDate = sBeginDate >= 10 ? sBeginDate : "0" + sBeginDate;
-                                var sEndYear = data[i].payPeriodEndDate.getFullYear();
-                                var sEndMonth = data[i].payPeriodEndDate.getMonth() + 1;
-                                var sEndDate = data[i].payPeriodEndDate.getDate();
+                                var sEndYear = data[i].cust_MGCPayPeriodEndDate.getFullYear();
+                                var sEndMonth = data[i].cust_MGCPayPeriodEndDate.getMonth() + 1;
+                                var sEndDate = data[i].cust_MGCPayPeriodEndDate.getDate() + 1;
                                 sEndMonth = sEndMonth >= 10 ? sEndMonth : "0" + sEndMonth;
                                 sEndDate = sEndDate >= 10 ? sEndDate : "0" + sEndDate;
                                 var sBeginDateVal = sBeginYear + "-" + sBeginMonth + "-" + sBeginDate;
-                                var sEndDateVal = sEndYear + "-" + sEndMonth + "-" + sEndDate;
+                                var sEndDateVal = sEndYear + "-" + sEndMonth + "-" + sEndDate;*/
                                 // filter for payperiod selection
                                 var PayPeriodBeginDate = new sap.ui.model.Filter({
                                     path: "PayPeriodBeginDate",
                                     operator: sap.ui.model.FilterOperator.EQ,
-                                    value1: sBeginDateVal
+                                    value1: data[i].cust_MGCPayPeriodBeginDate
                                 });
                                 oFilterValues.push(PayPeriodBeginDate);
                                 var PayPeriodEndDate = new sap.ui.model.Filter({
                                     path: "PayPeriodEndDate",
                                     operator: sap.ui.model.FilterOperator.EQ,
-                                    value1: sEndDateVal
+                                    value1: data[i].cust_MGCPayPeriodEndDate
                                 });
                                 oFilterValues.push(PayPeriodEndDate);
                                 break;
@@ -338,7 +338,10 @@ sap.ui.define([
                 // get details with selected filters from TimeSheetDetails
                 this.getOwnerComponent().getModel().read("/TimeSheetDetails_prd", {
                     filters: oFilterValues,
-                    urlParameters: { "$select": "Date,EmployeeID,EmployeeName,PayPeriodBeginDate,PayPeriodEndDate,CompanyID,CompanyName,OverTime,RegularTime,TotalHours,TotalHoursPercentage,SaveSubmitStatus,PayrollApprovalStatus,PayrollApprovalName,PayCode,OtThreshold,AppName,CostCenter,Activity,WorkOrder,Job,Section,Phase" },
+                    sorters: [
+                        new sap.ui.model.Sorter("Date", /*descending*/false) // "Sorter" required from "sap/ui/model/Sorter"
+                    ],
+                    urlParameters: { "$select": "Date,EmployeeID,EmployeeName,PayPeriodBeginDate,PayPeriodEndDate,CompanyID,CompanyName,OverTime,RegularTime,TotalHours,TotalHoursPercentage,SaveSubmitStatus,PayrollApprovalStatus,PayrollApprovalName,PayCode,OtThreshold,AppName,CostCenter,Activity,WorkOrder,Job,Section,Phase,ManagerApprovalName" },
                     success: function (odata) {
                         this.completeResponse = odata.results;
                         timePeriodPromise.resolve(odata.results);
@@ -632,6 +635,16 @@ sap.ui.define([
                 this.oActivityF4HelpCancel();
                 this.UpdateIndicatorValue(oEvent, this.oSelectedActivityPath); // update indicator with X for approved objects
             },
+            // filter payperiod 
+            onSearchPayPeriod: function (oEvent) {
+                var sQuery = oEvent.getSource().getValue();
+                var ProceedRunId = new sap.ui.model.Filter("processingRunId", sap.ui.model.FilterOperator.Contains, sQuery);
+                var BeginDate = new sap.ui.model.Filter("cust_MGCPayPeriodBeginDate", sap.ui.model.FilterOperator.Contains, sQuery);
+                var EndDate = new sap.ui.model.Filter("cust_MGCPayPeriodEndDate", sap.ui.model.FilterOperator.Contains, sQuery);
+                var filters = new sap.ui.model.Filter([ProceedRunId, BeginDate,EndDate]);
+                var listassign = sap.ui.getCore().byId("idPayPeriodTable");
+                listassign.getBinding("items").filter(filters, "Appliation");
+            },
             // select payperiod
             onSelectPayPeriod: function (oEvent) {
                 var sSelectedPath = oEvent.getSource().getBindingContextPath();
@@ -693,8 +706,8 @@ sap.ui.define([
                 var filters = new sap.ui.model.Filter([externalCode, sName]);
                 evt.getSource().getBinding("items").filter(filters, "Appliation");
             },
-             //select subarea
-             onConfirmSubArea: function (evt) {
+            //select subarea
+            onConfirmSubArea: function (evt) {
                 var aSelectedItems = evt.getParameter("selectedItems"),
                     oMultiInput = this.getView().byId("idSubarea"),
                     tokens = oMultiInput.getTokens();
@@ -1021,8 +1034,11 @@ sap.ui.define([
                 var oFiltersubarea = [];
                 var paycodePromise = jQuery.Deferred();
                 sap.ui.getCore().byId("idTimesheetDialog").setBusy(true);
+
                 /// Filters for Service call
                 if (empSubarea.length !== 0) {
+                    this.PersonalSubArea = empSubarea[0].PersonnelSubArea;
+                    this.Location = empSubarea[0].LocationCode;
                     var subarea = new sap.ui.model.Filter({
                         path: "cust_PSA_PersonnelSubareaID",
                         operator: sap.ui.model.FilterOperator.EQ,
@@ -1122,12 +1138,12 @@ sap.ui.define([
                     var date = day + "-" + aTimePeriodModel[aTimePeriodModel.length - 1].Date.split("-")[1] + "-" + aTimePeriodModel[aTimePeriodModel.length - 1].Date.split("-")[2];
                 } catch (err) { }
                 for (var i = 0; i < aTimePeriodModel.timesheetData.length; i++) {
-                    aTimePeriodModel.timesheetData[i].PayrollApprovalStatus = "Not";
+                    aTimePeriodModel.timesheetData[i].PayrollApprovalStatus = "";
                 }
                 var oRecord = {
                     "MinDate": this.oFromDate, "MaxDate": this.oToDate, "Date": "", "PayCode": "", "CostCenter": "", "Activity": "",
                     "WorkOrder": "", "Job": "", "Section": "", "Phase": "", "TotalHours": "", "ManagerApprovalName": this.loginName, "SaveSubmitStatus": "Approved",
-                    "PayrollApprovalStatus": "Not", "NewRecord": true
+                    "PayrollApprovalStatus": "", "NewRecord": true , "LocationCode":this.Location,"PersonnelSubArea": this.PersonalSubArea
                 };
                 aTimePeriodModel.timesheetData.push(oRecord);
                 oModel.refresh();
@@ -1485,7 +1501,9 @@ sap.ui.define([
                         payload.PayrollApprovalStatus = timePeriodData[i].PayrollApprovalStatus;
                         payload.TotalHours = timePeriodData[i].TotalHours.replaceAll(":", ".");
                         payload.Activity = timePeriodData[i].Activity;
-                        payload.UpdateIndicator = timePeriodData[i].UpdateIndicator;
+                        payload.UpdateIndicator = timePeriodData[i].UpdateIndicator == null ? "":timePeriodData[i].UpdateIndicator;
+                        payload.PersonnelSubArea = timePeriodData[i].PersonnelSubArea;
+                        payload.LocationCode = timePeriodData[i].LocationCode;
                         // sick/vacation leave service call for sf
                         var extcode = timestamp + dyear.toString() + dmonth.toString() + dday.toString() + timePeriodData[0].EmployeeID + i;
                         if ((timePeriodData[i].PayCode == "1140" || timePeriodData[i].PayCode == "2000") && timePeriodData[i].NewRecord == true) {
@@ -1592,6 +1610,20 @@ sap.ui.define([
                             payload.EmployeeName = this.completeResponse[j].EmployeeName;
                             payload.PayPeriodBeginDate = this.completeResponse[j].PayPeriodBeginDate;
                             payload.PayPeriodEndDate = this.completeResponse[j].PayPeriodEndDate;
+                            if(this.completeResponse[j].PersonnelSubArea == undefined || this.completeResponse[j].PersonnelSubArea == null){
+                                payload.PersonnelSubArea = "";
+                            }
+                            else{
+                                payload.PersonnelSubArea = this.completeResponse[j].PersonnelSubArea;
+                            }
+                            
+                            if(this.completeResponse[j].LocationCode == undefined || this.completeResponse[j].LocationCode == null){
+                                payload.LocationCode = "";
+                            }
+                            else{
+                                payload.LocationCode = this.completeResponse[j].LocationCode;
+                            }
+                            
                             payload.SaveSubmitStatus = "Approved";
                             var batchOperation = oDataModel.createBatchOperation("/TimeSheetDetails_prd(ID=" + payload.ID + ",AppName='" + payload.AppName + "',Date='" + payload.Date + "')", "PATCH", payload);
                             batchArray.push(batchOperation);
@@ -1806,8 +1838,16 @@ sap.ui.define([
             createColumns: function () {
                 return [
                     {
+                        label: "Employee ID",
+                        property: "EmployeeID"
+                    },
+                    {
                         label: "Employee Name",
                         property: "EmployeeName"
+                    },
+                    {
+                        label: "Company ID",
+                        property: "CompanyID"
                     },
                     {
                         label: "Company Name",
@@ -1824,6 +1864,10 @@ sap.ui.define([
                     {
                         label: "PayPeriod EndDate",
                         property: "PayPeriodEndDate"
+                    },
+                    {
+                        label: "Date",
+                        property: "Date"
                     },
                     {
                         label: "Period Hours",
@@ -1864,6 +1908,10 @@ sap.ui.define([
                     {
                         label: "Phase",
                         property: "Phase"
+                    },
+                    {
+                        label: "Approver Name",
+                        property: "ManagerApprovalName"
                     },
                     {
                         label: "Timesheet Status",

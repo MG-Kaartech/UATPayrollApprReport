@@ -2,7 +2,7 @@
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core">
 <SelectDialog
-		title="{i18n>location}"
+		title="{i18n>personalSubArea}"
 		items="{
 			path: 'valueHelp>/subarea',
 			sorter: {
