@@ -641,7 +641,7 @@ sap.ui.define([
                 var ProceedRunId = new sap.ui.model.Filter("processingRunId", sap.ui.model.FilterOperator.Contains, sQuery);
                 var BeginDate = new sap.ui.model.Filter("cust_MGCPayPeriodBeginDate", sap.ui.model.FilterOperator.Contains, sQuery);
                 var EndDate = new sap.ui.model.Filter("cust_MGCPayPeriodEndDate", sap.ui.model.FilterOperator.Contains, sQuery);
-                var filters = new sap.ui.model.Filter([ProceedRunId, BeginDate,EndDate]);
+                var filters = new sap.ui.model.Filter([ProceedRunId, BeginDate, EndDate]);
                 var listassign = sap.ui.getCore().byId("idPayPeriodTable");
                 listassign.getBinding("items").filter(filters, "Appliation");
             },
@@ -1143,7 +1143,7 @@ sap.ui.define([
                 var oRecord = {
                     "MinDate": this.oFromDate, "MaxDate": this.oToDate, "Date": "", "PayCode": "", "CostCenter": "", "Activity": "",
                     "WorkOrder": "", "Job": "", "Section": "", "Phase": "", "TotalHours": "", "ManagerApprovalName": this.loginName, "SaveSubmitStatus": "Approved",
-                    "PayrollApprovalStatus": "", "NewRecord": true , "LocationCode":this.Location,"PersonnelSubArea": this.PersonalSubArea
+                    "PayrollApprovalStatus": "", "NewRecord": true, "LocationCode": this.Location, "PersonnelSubArea": this.PersonalSubArea
                 };
                 aTimePeriodModel.timesheetData.push(oRecord);
                 oModel.refresh();
@@ -1501,7 +1501,7 @@ sap.ui.define([
                         payload.PayrollApprovalStatus = timePeriodData[i].PayrollApprovalStatus;
                         payload.TotalHours = timePeriodData[i].TotalHours.replaceAll(":", ".");
                         payload.Activity = timePeriodData[i].Activity;
-                        payload.UpdateIndicator = timePeriodData[i].UpdateIndicator == null ? "":timePeriodData[i].UpdateIndicator;
+                        payload.UpdateIndicator = timePeriodData[i].UpdateIndicator == null ? "" : timePeriodData[i].UpdateIndicator;
                         payload.PersonnelSubArea = timePeriodData[i].PersonnelSubArea;
                         payload.LocationCode = timePeriodData[i].LocationCode;
                         // sick/vacation leave service call for sf
@@ -1610,20 +1610,20 @@ sap.ui.define([
                             payload.EmployeeName = this.completeResponse[j].EmployeeName;
                             payload.PayPeriodBeginDate = this.completeResponse[j].PayPeriodBeginDate;
                             payload.PayPeriodEndDate = this.completeResponse[j].PayPeriodEndDate;
-                            if(this.completeResponse[j].PersonnelSubArea == undefined || this.completeResponse[j].PersonnelSubArea == null){
+                            if (this.completeResponse[j].PersonnelSubArea == undefined || this.completeResponse[j].PersonnelSubArea == null) {
                                 payload.PersonnelSubArea = "";
                             }
-                            else{
+                            else {
                                 payload.PersonnelSubArea = this.completeResponse[j].PersonnelSubArea;
                             }
-                            
-                            if(this.completeResponse[j].LocationCode == undefined || this.completeResponse[j].LocationCode == null){
+
+                            if (this.completeResponse[j].LocationCode == undefined || this.completeResponse[j].LocationCode == null) {
                                 payload.LocationCode = "";
                             }
-                            else{
+                            else {
                                 payload.LocationCode = this.completeResponse[j].LocationCode;
                             }
-                            
+
                             payload.SaveSubmitStatus = "Approved";
                             var batchOperation = oDataModel.createBatchOperation("/TimeSheetDetails_prd(ID=" + payload.ID + ",AppName='" + payload.AppName + "',Date='" + payload.Date + "')", "PATCH", payload);
                             batchArray.push(batchOperation);
@@ -1823,6 +1823,18 @@ sap.ui.define([
             },
             onExportTimeData: function (oEvent) {
                 var dateObject = new Date();
+                var ExportData = [];
+                var sBeginDateVal = this.getView().byId("idStartDate").getValue();
+                var sEndDateVal = this.getView().byId("idFinishDate").getValue();
+                if (sBeginDateVal !== "" || sEndDateVal !== "") {
+                    for (var i = 0; i < this.completeResponse.length; i++) {
+                        if (sBeginDateVal <= this.completeResponse[i].Date && sEndDateVal >= this.completeResponse[i].Date) {
+                            ExportData.push(this.completeResponse[i]);
+                        }
+                    }
+                } else {
+                    ExportData = this.completeResponse;
+                }
                 var date = dateObject.getDate().toString();
                 var month = (dateObject.getMonth() + 1).toString();
                 var year = dateObject.getFullYear().toString();
