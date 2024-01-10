@@ -1905,6 +1905,10 @@ sap.ui.define([
                         property: "PayCode"
                     },
                     {
+                        label: "PayPeriod Description",
+                        property:"PayPeriodDescription"
+                    },
+                    {
                         label: "CostCenter",
                         property: "CostCenter"
                     },
