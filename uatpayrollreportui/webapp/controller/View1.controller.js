@@ -1344,6 +1344,13 @@ sap.ui.define([
                         sap.ui.getCore().byId("idSave").setEnabled(false);
                         return;
                     }
+
+                    if(oModelData[i].Job != "" && (oModelData[i].Section == "" ||oModelData[i].Phase == "")){
+                        MessageBox.error(this.getResourceBundle().getText("errorWBSValidation"));
+                        this.getView().getModel("timePeriod").refresh();
+                        sap.ui.getCore().byId("idSave").setEnabled(false);
+                        return;
+                    }
                 }
                 var valueHelpData = this.getView().getModel("valueHelp").getData();
                 // sick leave validation
