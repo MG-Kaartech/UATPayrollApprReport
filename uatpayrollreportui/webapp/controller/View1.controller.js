@@ -1901,11 +1901,11 @@ sap.ui.define([
                         property: "OverTime"
                     },
                     {
-                        label: "PayCode",
+                        label: "PayCode ID",
                         property: "PayCode"
                     },
                     {
-                        label: "PayPeriod Description",
+                        label: "PayCode Description",
                         property:"PayPeriodDescription"
                     },
                     {
