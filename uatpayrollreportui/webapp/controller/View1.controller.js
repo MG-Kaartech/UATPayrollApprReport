@@ -1408,6 +1408,11 @@ sap.ui.define([
                     sap.ui.getCore().byId("idSave").setEnabled(false);
                     return;
                 }
+                if(oItem.TotalHours == "00:00"){
+                    MessageBox.error(this.getResourceBundle().getText("errorZeroHours"));
+                    sap.ui.getCore().byId("idSave").setEnabled(false);
+                    return;
+                }
                 var Hours = 0;
                 sap.ui.getCore().byId("idSave").setEnabled(true);
                 for (var i = 0; i < oData.getData().timesheetData.length; i++) {
