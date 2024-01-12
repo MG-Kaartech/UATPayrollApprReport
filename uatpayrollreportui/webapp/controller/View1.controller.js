@@ -1672,6 +1672,7 @@ sap.ui.define([
                     MessageBox.error(this.getResourceBundle().getText("errorAtleatOneRecord"));
                     return;
                 }
+                sap.ui.core.BusyIndicator.show(-1);
                 for (var i = 0; i < selectedValues.length; i++) {
                     var oSelectedData = this.getView().getModel("payroll").getProperty(selectedValues[i]);
                     for (var j = 0; j < this.completeResponse.length; j++) {
@@ -1869,14 +1870,17 @@ sap.ui.define([
                         if (oResult.__batchResponses[0].__changeResponses[0].statusCode == '201' || oResult.__batchResponses[0].__changeResponses[0].statusCode == '200') {
                             MessageBox.success(this.getResourceBundle().getText("successRecordPosted"));
                             this.onSearch(); // refresh time sheet details
+                            sap.ui.core.BusyIndicator.hide();
                         }
                     } catch (err) { }
                     try {
                         if (oResult.__batchResponses[0].response.statusCode == '400' || oResult.__batchResponses[0].response.statusCode == '405') {
                             MessageBox.error(this.getResourceBundle().getText("errorRecordPosted"));
+                            sap.ui.core.BusyIndicator.hide();
                         }
                     } catch (err) { }
                 }.bind(this), function (oError) {
+                    sap.ui.core.BusyIndicator.hide();
                     MessageBox.error(this.getResourceBundle().getText("errorBatch"));
                 }.bind(this));
             },
