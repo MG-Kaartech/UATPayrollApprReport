@@ -142,8 +142,8 @@
                                     valueFormat="yyyy-MM-dd"
                                     change="onDateChange"
                                     valueState="{timePeriod>DateValueState}"
-                                    editable="{ parts: [ {path: 'timePeriod>PayCode'},{path: 'timePeriod>TotalHours'},{path:'timePeriod>NewRecord'} ], formatter: '.formatter.SickEditable' }"
-                                />
+                                    editable="{ parts: [ {path:'timePeriod>NewRecord'} ], formatter: '.formatter.SickDateEditable' }"
+                                /><!--editable="{ parts: [ {path: 'timePeriod>PayCode'},{path: 'timePeriod>TotalHours'},{path:'timePeriod>NewRecord'} ], formatter: '.formatter.SickEditable' }"-->
                                 <ComboBox
                                     selectedKey="{timePeriod>PayCode}"
                                     tooltip="{timePeriod>PayCode}"

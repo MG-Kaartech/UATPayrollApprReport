@@ -31,6 +31,14 @@ sap.ui.define([], function () {
 				return "Not Executed";
 			}
 		},
+		SickDateEditable:function(NewRecord){
+			if (NewRecord == true) {
+				return true;
+			}
+			else{
+				return false;
+			}
+		},
 		PayCodeCount: function (val) {
 			var count = 0;
 			if (val != null) {
