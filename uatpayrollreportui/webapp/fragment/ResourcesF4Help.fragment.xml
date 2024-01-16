@@ -1,61 +1,25 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:l="sap.ui.layout"
-    xmlns:f="sap.ui.layout.form"
 >
-    <Dialog
-        class="sapUiContentPadding"
+    <SelectDialog
         title="{i18n>resource}"
-        contentWidth="35%"
-    >
-        <content>
-            <Table id="idEmpTable" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingThreshold="50" growingScrollToLoad="true"
-            items="{
+        items="{
 			path: 'valueHelp>/emp',
 			sorter: {
 				path: 'FirstName'
 			}
-		}">
-                <headerToolbar>
-			<OverflowToolbar>
-				<content>
-					<SearchField search="onSearchEmployee" liveChange="onSearchEmployee"></SearchField>
-					<ToolbarSpacer />
-				</content>
-			</OverflowToolbar>
-		</headerToolbar>
-                <columns>
-                    <Column>
-                        <Text text="{i18n>empId}" />
-                    </Column>
-                    <Column>
-                        <Text text="{i18n>firstName}"  />
-                    </Column>
-                    <Column>
-                        <Text text="{i18n>lastName}" />
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem type="Active" press="onSelectEmployee">
-                        <cells>
-                            <Text text="{valueHelp>ID}" />
-                            <Text text="{valueHelp>FirstName}" />
-                            <Text text="{valueHelp>LastName}" />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-        <footer>
-            <OverflowToolbar>
-                <ToolbarSpacer />
-                <Button
-                    type="Negative"
-                    text="Close"
-                    press="oResourcesF4HelpCancel"
-                />
-            </OverflowToolbar>
-        </footer>
-    </Dialog>
+		}"
+        search="onSearchEmployee"
+        confirm="onSelectEmployee"
+        cancel="onSelectEmployee"
+        multiSelect="true"
+    >
+        <StandardListItem
+            id="idEmpTable"
+            title="{valueHelp>FirstName} {valueHelp>LastName}"
+            description="{valueHelp>ID}"
+        />
+    </SelectDialog>
 </core:FragmentDefinition>
+

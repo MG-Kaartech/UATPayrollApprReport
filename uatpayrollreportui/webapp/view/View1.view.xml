@@ -47,7 +47,7 @@
                     visibleInFilterBar="true"
                 >
                     <fb:control>
-                        <Input
+                        <MultiInput
                             id="companyInput"
                             placeholder="{i18n>company}"
                             showValueHelp="true"
@@ -63,7 +63,7 @@
                     visibleInFilterBar="true"
                 >
                     <fb:control>
-                        <Input
+                        <MultiInput
                             id="resourceInput"
                             placeholder="{i18n>resource}"
                             showValueHelp="true"
