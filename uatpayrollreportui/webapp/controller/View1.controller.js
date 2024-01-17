@@ -515,6 +515,7 @@ sap.ui.define([
                 var sObj = this.getView().getModel("valueHelp").getProperty(sSelectedPath);
                 var sSelectedValue = this.getView().getModel("timePeriod").getProperty(this.oSelectedJobPath);
                 sSelectedValue.Job = sObj.ID;//sObj.Name;
+                sSelectedValue.JobDescription = sObj.Description;
                 sSelectedValue.CostCenter = "";
                 sSelectedValue.Activity = "";
                 sSelectedValue.WorkOrder = "";
@@ -543,6 +544,7 @@ sap.ui.define([
                 var sObj = this.getView().getModel("valueHelp").getProperty(sSelectedPath);
                 var sSelectedValue = this.getView().getModel("timePeriod").getProperty(this.oSelectedWorkOrderPath);
                 sSelectedValue.WorkOrder = sObj.ID;//sObj.Name;
+                sSelectedValue.WorkorderDescription = sObj.Description;
                 sSelectedValue.CostCenter = "";
                 sSelectedValue.Activity = "";
                 sSelectedValue.Job = "";
@@ -568,6 +570,7 @@ sap.ui.define([
                 var sObj = this.getView().getModel("valueHelp").getProperty(sSelectedPath);
                 var sSelectedValue = this.getView().getModel("timePeriod").getProperty(this.oSelectedSectionPath);
                 sSelectedValue.Section = sObj.ID;// sObj.Name;
+                sSelectedValue.SectionDescription = sObj.Description;
                 sSelectedValue.WorkOrder = "";
                 sSelectedValue.CostCenter = "";
                 sSelectedValue.Activity = "";
@@ -592,6 +595,7 @@ sap.ui.define([
                 var sObj = this.getView().getModel("valueHelp").getProperty(sSelectedPath);
                 var sSelectedValue = this.getView().getModel("timePeriod").getProperty(this.oSelectedPhaseCodePath);
                 sSelectedValue.Phase = sObj.ID;//sObj.Name;
+                sSelectedValue.PhaseDescription = sObj.Description;
                 sSelectedValue.CostCenter = "";
                 sSelectedValue.Activity = "";
                 sSelectedValue.WorkOrder = "";
@@ -913,15 +917,15 @@ sap.ui.define([
                 }
                 var aCostCenter = [];
                 // restrcting ESG app can see 6002 companyID costcenters only
-                if(sSelectedValue.AppName == "ESG"){
-                    for(var i = 0;i<this.oCostScenter.length;i++){
-                        if(this.oCostScenter[i].legalEntity == "6002"){
+                if (sSelectedValue.AppName == "ESG") {
+                    for (var i = 0; i < this.oCostScenter.length; i++) {
+                        if (this.oCostScenter[i].legalEntity == "6002") {
                             aCostCenter.push(this.oCostScenter[i]);
                         }
                     }
                     this.getView().getModel("valueHelp").setProperty("/costcenter", aCostCenter)
                 }
-                else{
+                else {
                     this.getView().getModel("valueHelp").setProperty("/costcenter", this.oCostScenter)
                 }
                 this.getView().getModel("valueHelp").refresh();
@@ -1101,7 +1105,7 @@ sap.ui.define([
                 var Screen1Filters = this.oSelectedFilters();
                 var oFilterValues = [];
                 Screen1Filters.forEach(oItem => {
-                    if (oItem.sPath !== 'Date' && oItem.sPath !== "PayPeriodBeginDate" && oItem.sPath !== "PayPeriodEndDate" && oItem.sPath !== "EmployeeID" &&  oItem.sPath !== "CompanyID") {
+                    if (oItem.sPath !== 'Date' && oItem.sPath !== "PayPeriodBeginDate" && oItem.sPath !== "PayPeriodEndDate" && oItem.sPath !== "EmployeeID" && oItem.sPath !== "CompanyID") {
                         oFilterValues.push(oItem);
                     }
                 })
@@ -1129,7 +1133,7 @@ sap.ui.define([
                     value1: oSelectedData.CompanyID
                 });
                 oFilterValues.push(oCompanyID);
-                
+
                 var oTimePeriodModel = new JSONModel();
                 this.getView().setModel(oTimePeriodModel, "timePeriod");
                 //get timesheet details
@@ -1555,11 +1559,15 @@ sap.ui.define([
                         payload.ManagerApprovalEmail = timePeriodData[i].ManagerApprovalEmail == null ? "" : timePeriodData[i].ManagerApprovalEmail;
                         payload.PayrollApprovalName = timePeriodData[i].PayrollApprovalName == null ? "" : timePeriodData[i].PayrollApprovalName;
                         payload.WorkOrder = timePeriodData[i].WorkOrder == null ? "" : timePeriodData[i].WorkOrder;
+                        payload.WorkorderDescription = timePeriodData[i].WorkorderDescription == null ? "" : timePeriodData[i].WorkorderDescription;
                         payload.PayCode = timePeriodData[i].PayCode == null ? "" : timePeriodData[i].PayCode;
                         payload.Job = timePeriodData[i].Job == null ? "" : timePeriodData[i].Job;
+                        payload.JobDescription = timePeriodData[i].JobDescription == null ? "" : timePeriodData[i].JobDescription;
                         payload.ProfitCenter = timePeriodData[i].ProfitCenter == null ? "" : timePeriodData[i].ProfitCenter;
                         payload.Section = timePeriodData[i].Section == null ? "" : timePeriodData[i].Section;
+                        payload.SectionDescription = timePeriodData[i].SectionDescription == null ? "" : timePeriodData[i].SectionDescription;
                         payload.Phase = timePeriodData[i].Phase == null ? "" : timePeriodData[i].Phase;
+                        payload.PhaseDescription = timePeriodData[i].PhaseDescription == null ? "" : timePeriodData[i].PhaseDescription;
                         payload.CostCenter = timePeriodData[i].CostCenter == null ? "" : timePeriodData[i].CostCenter;
                         payload.SaveSubmitStatus = timePeriodData[i].SaveSubmitStatus;
                         payload.PayrollApprovalStatus = timePeriodData[i].PayrollApprovalStatus == null ? "" : timePeriodData[i].PayrollApprovalStatus;
@@ -1568,6 +1576,11 @@ sap.ui.define([
                         payload.SequenceNo = timePeriodData[i].SequenceNo == null ? "" : timePeriodData[i].SequenceNo;
                         payload.UpdateIndicator = timePeriodData[i].UpdateIndicator == null ? "" : timePeriodData[i].UpdateIndicator;
                         payload.PayPeriodDescription = timePeriodData[i].PayPeriodDescription == null ? "" : timePeriodData[i].PayPeriodDescription;
+                        payload.Comments = timePeriodData[i].Comments == null ? "" : timePeriodData[i].Comments;
+                        payload.ForemanID = timePeriodData[i].ForemanID == null ? "" : timePeriodData[i].ForemanID;
+                        payload.EquipmentID = timePeriodData[i].EquipmentID == null ? "" : timePeriodData[i].EquipmentID;
+                        payload.SendingUnitTrailer = timePeriodData[i].SendingUnitTrailer == null ? "" : timePeriodData[i].SendingUnitTrailer;
+                        payload.ReceivingUnitTruck = timePeriodData[i].ReceivingUnitTruck == null ? "" : timePeriodData[i].ReceivingUnitTruck;
                         // sick/vacation leave service call for sf
                         var extcode = timestamp + dyear.toString() + dmonth.toString() + dday.toString() + timePeriodData[0].EmployeeID + i;
                         if ((timePeriodData[i].PayCode == "1140" || timePeriodData[i].PayCode == "2000") && timePeriodData[i].NewRecord == true) {
@@ -1767,9 +1780,19 @@ sap.ui.define([
                                 obj.WageType = wagetype;
                                 this.completeResponse[j].TotalHours = this.completeResponse[j].TotalHours.replaceAll(":", ".");
                                 obj.Amount = "";
+                                /////
+                                if (wagetype == "") {
+                                    if (Number(this.completeResponse[j].OverTime) != 0) {
+                                        obj.WageType = "1090";
+                                    }
+                                    if (Number(this.completeResponse[j].RegularTime) != 0) {
+                                        obj.WageType = "1000";
+                                    }
+                                }
+                                ////
                                 if (obj.WageType == "1000" || obj.WageType == "1090") {
                                     obj.Unit = "Hours";
-                                    obj.Currency = "";
+                                    obj.Currency = "CAD";
                                 }
                                 else {
                                     for (var k = 0; k < oPayCodeList.length; k++) {
@@ -1807,28 +1830,37 @@ sap.ui.define([
                                         }
                                     }
                                 }
-                                obj.Number = this.completeResponse[j].TotalHours.replaceAll(":", ".");
+                                if (obj.Amount != "") {
+                                    obj.Number = "";
+                                }
+                                else {
+                                    obj.Number = this.completeResponse[j].TotalHours.replaceAll(":", ".");
+                                }
                                 obj.CostCenter = this.completeResponse[j].CostCenter;
-                                obj.CompanyCodeCostCenter = this.completeResponse[j].CompanyID;
-
-                                let job = this.completeResponse[j].Job == null ? "" : this.completeResponse[j].Job;
-                                let section = this.completeResponse[j].Section == null ? "" : this.completeResponse[j].Section;
+                                if(obj.CostCenter !== ""){
+                                    obj.CompanyCodeCostCenter = this.completeResponse[j].CompanyID;
+                                }
+                                else{
+                                    obj.CompanyCodeCostCenter = "";
+                                }
+                                // let job = this.completeResponse[j].Job == null ? "" : this.completeResponse[j].Job;
+                                //let section = this.completeResponse[j].Section == null ? "" : this.completeResponse[j].Section;
                                 let phase = this.completeResponse[j].Phase == null ? "" : this.completeResponse[j].Phase;
                                 let wbs = "";
-                                obj.Posid = phase;
-                                if (job == "" || section == "" || phase == "") {
-                                    wbs = "";
-                                }
-                                else if (job != "" && section != "" && phase != "") {
-                                    wbs = job + "-" + section + "-" + phase;
-                                }
-                                else if (job != "" && section != "") {
-                                    wbs = job + "-" + section;
-                                }
-                                else if (job != "") {
-                                    wbs = job;
-                                }
-                                obj.WBS = wbs;// RT/OT payload condition
+                                obj.Posid = "";
+                                /* if (job == "" || section == "" || phase == "") {
+                                     wbs = "";
+                                 }
+                                 else if (job != "" && section != "" && phase != "") {
+                                     wbs = job + "-" + section + "-" + phase;
+                                 }
+                                 else if (job != "" && section != "") {
+                                     wbs = job + "-" + section;
+                                 }
+                                 else if (job != "") {
+                                     wbs = job;
+                                 }*/
+                                obj.WBS = phase;// RT/OT payload condition
                                 if (Number(this.completeResponse[j].OverTime) != 0) {
                                     obj.WageType = "1090";
                                     obj.Number = this.completeResponse[j].OverTime;
