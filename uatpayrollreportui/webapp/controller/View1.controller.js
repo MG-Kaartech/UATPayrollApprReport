@@ -339,6 +339,7 @@ sap.ui.define([
                 $.when(timePeriodPromise).done(
                     function (TimePeriodData) { // arrange cumulative data for payroll report
                         var finalArray = [];
+                        this.getView().byId("idTimesheetItems").setText(this.getResourceBundle().getText("timesheetRecords")+"("+TimePeriodData.length +")");
                         TimePeriodData.forEach(oItem => {
                             // condition calculate date for employee ID, payperiod begin date, payperiod end date
                             let iIndex = finalArray.findIndex(oFindObj => { return oFindObj.EmployeeID == oItem.EmployeeID && oFindObj.PayPeriodBeginDate == oItem.PayPeriodBeginDate && oFindObj.PayPeriodEndDate == oItem.PayPeriodEndDate });
@@ -367,6 +368,7 @@ sap.ui.define([
                                     obj.OtThreshold = oArr.OtThreshold;
                                     obj.OtFrequency = oArr.OtFrequency;
                                     obj.EmployeeID = oArr.EmployeeID;
+                                    obj.AppName = oArr.AppName;
                                     /*if (obj.RegularTime > obj.OtThreshold && (obj.OtThreshold != null && obj.OtThreshold != "")) {
                                         obj.OverTime = obj.RegularTime - obj.OtThreshold;
                                         obj.RegularTime = obj.OtThreshold;
@@ -1089,6 +1091,8 @@ sap.ui.define([
                     try {
                         this.getView().getModel("valueHelp").setProperty("/sick", oResult.__batchResponses[1].data.results);
                     } catch (err) { }
+                    console.log("Vacation",oResult.__batchResponses[0].data.results);
+                    console.log("Sick",oResult.__batchResponses[1].data.results);
                     try {
                         this.getView().getModel("valueHelp").setProperty("/paycode", oResult.__batchResponses[2].data.results);
                         if (JSON.parse(oResult.__batchResponses[2].data.results.length === 0)) {
@@ -1170,6 +1174,7 @@ sap.ui.define([
                 var aTimePeriodModel = oModel.getData();
                 this.timePeriod = aTimePeriodModel.timesheetData.timeperiod;
                 try {
+                    var appName = aTimePeriodModel.timesheetData[aTimePeriodModel.timesheetData.length-1].AppName;
                     var day = parseInt(aTimePeriodModel[aTimePeriodModel.length - 1].Date.split("-")[0]) + 1;
                     var date = day + "-" + aTimePeriodModel[aTimePeriodModel.length - 1].Date.split("-")[1] + "-" + aTimePeriodModel[aTimePeriodModel.length - 1].Date.split("-")[2];
                 } catch (err) { }
@@ -1177,7 +1182,7 @@ sap.ui.define([
                     aTimePeriodModel.timesheetData[i].PayrollApprovalStatus = "";
                 }
                 var oRecord = {
-                    "MinDate": this.oFromDate, "MaxDate": this.oToDate, "Date": "", "PayCode": "", "CostCenter": "", "Activity": "",
+                    "AppName":appName,"MinDate": this.oFromDate, "MaxDate": this.oToDate, "Date": "", "PayCode": "", "CostCenter": "", "Activity": "",
                     "WorkOrder": "", "Job": "", "Section": "", "Phase": "", "TotalHours": "", "ManagerApprovalName": this.loginName, "SaveSubmitStatus": "Approved",
                     "PayrollApprovalStatus": "", "NewRecord": true, "LocationCode": this.Location, "PersonnelSubArea": this.PersonalSubArea
                 };
@@ -1228,7 +1233,7 @@ sap.ui.define([
                     oTableData[idx].DELETED = true;
                     // RT OT caluculation
                     var oRTOTpayload = {};
-                    oRTOTpayload.AppName = oTableData[0].AppName;
+                    oRTOTpayload.AppName = oTableData[idx].AppName; // App Name added
                     oRTOTpayload.EmployeeID = oTableData[0].EmployeeID;
                     oRTOTpayload.PayPeriodBeginDate = oTableData[0].PayPeriodBeginDate;
                     oRTOTpayload.PayPeriodEndDate = oTableData[0].PayPeriodEndDate;
@@ -1239,10 +1244,10 @@ sap.ui.define([
                         sfpayload.externalCode = timestamp + dyear.toString() + dmonth.toString() + dday.toString() + oTableData[0].EmployeeID + i;
                         var timeaccount = valueHelpData.vacation[0] && valueHelpData.vacation[0].timeAccount ? valueHelpData.vacation[0].timeAccount : "";
                         sfpayload.TimeAccount_externalCode = timeaccount;
-                        sfpayload.bookingAmount = "+" + oTableData[idx].TotalHours;
+                        sfpayload.bookingAmount = "+" + oTableData[idx].TotalHours.replaceAll(":",".");;
                         sfpayload.bookingType = "MANUAL_ADJUSTMENT";
                         sfpayload.bookingUnit = "HOURS";
-                        sfpayload.bookingDate = new Date().toISOString();
+                        sfpayload.bookingDate = new Date(oTableData[idx].Date+"T02:00:00Z").toISOString();
                         var sfbatchOperation = oSFDataModel.createBatchOperation("/TimeAccountDetail", "POST", sfpayload);
                         sfBatchArray.push(sfbatchOperation);
                     }
@@ -1250,10 +1255,10 @@ sap.ui.define([
                         sfpayload.externalCode = timestamp + dyear.toString() + dmonth.toString() + dday.toString() + oTableData[0].EmployeeID + i;
                         var timeaccount = valueHelpData.sick[0] && valueHelpData.sick[0].timeAccount ? valueHelpData.sick[0].timeAccount : "";
                         sfpayload.TimeAccount_externalCode = timeaccount;
-                        sfpayload.bookingAmount = "+" + oTableData[idx].TotalHours;
+                        sfpayload.bookingAmount = "+" + oTableData[idx].TotalHours.replaceAll(":",".");;
                         sfpayload.bookingType = "MANUAL_ADJUSTMENT";
                         sfpayload.bookingUnit = "HOURS";
-                        sfpayload.bookingDate = new Date().toISOString();
+                        sfpayload.bookingDate = new Date(oTableData[idx].Date+"T02:00:00Z").toISOString();
                         var sfbatchOperation = oSFDataModel.createBatchOperation("/TimeAccountDetail", "POST", sfpayload);
                         sfBatchArray.push(sfbatchOperation);
                     }
@@ -1325,6 +1330,13 @@ sap.ui.define([
                     this.UpdateIndicatorValue(oEvent); // update indicator with X for approved objects
                     if (sSelectedKey == "1140" || sSelectedKey == "2000") {
                         var sickValidation = this.sickLeaveValidation();
+                        oItem.CostCenter = "";
+                        oItem.Activity = "";
+                        oItem.WorkOrder = "";
+                        oItem.Job = "";
+                        oItem.Section = "";
+                        oItem.Phase = "";
+                        oItem.ManagerApprovalName = "";
                         if (sickValidation == "Error") {
                             return;
                         }
@@ -1543,10 +1555,10 @@ sap.ui.define([
                         var payload = {};
                         var sfpayload = {};
                         payload.ID = timePeriodData[i].ID;
-                        payload.AppName = timePeriodData[0].AppName;
+                        payload.AppName = timePeriodData[i].AppName; //App Name added
                         payload.Date = timePeriodData[i].Date;
                         payload.EmployeeID = timePeriodData[0].EmployeeID;
-                        payload.EmployeeName = timePeriodData[0].EmployeeName;
+                        payload.EmployeeName = timePeriodData[0].EmployeeName == null ? "" : timePeriodData[0].EmployeeName;
                         payload.CompanyID = timePeriodData[0].CompanyID;
                         payload.CompanyName = timePeriodData[0].CompanyName;
                         payload.PayPeriodBeginDate = timePeriodData[0].PayPeriodBeginDate;
@@ -1592,10 +1604,10 @@ sap.ui.define([
                             }
                             sfpayload.externalCode = extcode;
                             sfpayload.TimeAccount_externalCode = timeaccount;
-                            sfpayload.bookingAmount = "-" + timePeriodData[i].TotalHours;
+                            sfpayload.bookingAmount = "-" + timePeriodData[i].TotalHours.replaceAll(":",".");
                             sfpayload.bookingType = "MANUAL_ADJUSTMENT";
                             sfpayload.bookingUnit = "HOURS";
-                            sfpayload.bookingDate = new Date().toISOString();
+                            sfpayload.bookingDate = new Date(timePeriodData[i].Date+"T02:00:00Z").toISOString();
                             var sfbatchOperation = oSFDataModel.createBatchOperation("/TimeAccountDetail", "POST", sfpayload);
                             sfBatchArray.push(sfbatchOperation);
                         }
@@ -1610,7 +1622,7 @@ sap.ui.define([
 
                         // RT OT caluculation
                         var oRTOTpayload = {};
-                        oRTOTpayload.AppName = timePeriodData[0].AppName;
+                        oRTOTpayload.AppName = timePeriodData[i].AppName; //App Name added
                         oRTOTpayload.EmployeeID = timePeriodData[0].EmployeeID;
                         oRTOTpayload.PayPeriodBeginDate = timePeriodData[0].PayPeriodBeginDate;
                         oRTOTpayload.PayPeriodEndDate = timePeriodData[0].PayPeriodEndDate;
@@ -1665,6 +1677,26 @@ sap.ui.define([
                 }.bind(this));
                 try { this._oImportHolidayDialog.close(); } catch (err) { }
             },
+            onCalculateRTOT:function(){
+                var selectedValues = this.getView().byId("listTab").getSelectedContextPaths();
+                if (selectedValues.length == 0) {
+                    MessageBox.error(this.getResourceBundle().getText("errorAtleatOneRecordRTOT"));
+                    return;
+                }
+                sap.ui.core.BusyIndicator.show(-1);
+                for(var i=0;i<selectedValues.length;i++){
+                    var oRTOTpayload = {};
+                    var oTableData = this.getView().getModel("payroll").getProperty(selectedValues[i]);
+                    oRTOTpayload.AppName = oTableData.AppName;
+                    oRTOTpayload.EmployeeID = oTableData.EmployeeID;
+                    oRTOTpayload.PayPeriodBeginDate = oTableData.PayPeriodBeginDate;
+                    oRTOTpayload.PayPeriodEndDate = oTableData.PayPeriodEndDate;
+                    oRTOTpayload.OtFrequency = oTableData.OtFrequency;
+                    oRTOTpayload.Date = "";
+                    this.onRTOTCalculationCall(oRTOTpayload);
+                }
+                this.onSearch(); // refresh cumulative data
+            },
             onRTOTCalculationCall: function (payload) {
                 var oModel = this.getOwnerComponent().getModel();
                 var oDataModel = new sap.ui.model.odata.ODataModel(oModel.sServiceUrl);
@@ -1681,9 +1713,12 @@ sap.ui.define([
                     method: "GET",
                     success: function (oData, oResponse) {
                         var data = oData;
+                        MessageToast.show(this.getResourceBundle().getText("successrtot"));
+                        sap.ui.core.BusyIndicator.hide();
                     }.bind(this),
                     error: function (oError) {
-                        MessageToast.show("No data");
+                        MessageToast.show(this.getResourceBundle().getText("errortot"));
+                        sap.ui.core.BusyIndicator.hide();
                     }
                 });
             },
@@ -1708,7 +1743,7 @@ sap.ui.define([
                     MessageBox.error(this.getResourceBundle().getText("errorAtleatOneRecord"));
                     return;
                 }
-                sap.ui.core.BusyIndicator.show(-1);
+                this.getView().byId("listTab").setBusy(true);
                 for (var i = 0; i < selectedValues.length; i++) {
                     var oSelectedData = this.getView().getModel("payroll").getProperty(selectedValues[i]);
                     for (var j = 0; j < this.completeResponse.length; j++) {
@@ -1762,7 +1797,7 @@ sap.ui.define([
                         return;
                     }
                 }
-                sap.ui.core.BusyIndicator.show(-1);
+                this.getView().byId("listTab").setBusy(true);
                 var oPayCodeList = this.getView().getModel("valueHelp").getData().paycodeall;
                 var oCost_allowance = this.getView().getModel("valueHelp").getData().cost_allowance;
                 var cpiPayload = [];
@@ -1815,17 +1850,17 @@ sap.ui.define([
                                 }
                                 if (obj.Unit == "Amount") {
                                     obj.Number = "";
-                                    for (var i = 0; i < oCost_allowance.length; i++) {
-                                        if (oCost_allowance[i].cust_paycodeID == wagetype && (oCost_allowance[i].cust_Location !== null && oCost_allowance[i].cust_Location == this.completeResponse[j].LocationCode) && (oCost_allowance[i].cust_profitCenter !== null && oCost_allowance[i].cust_profitCenter == this.completeResponse[j].ProfitCenter)) {
-                                            obj.Amount = Number(oCost_allowance[i].cust_Amount) * Number(this.completeResponse[j].TotalHours);
+                                    for (var a = 0; a < oCost_allowance.length; a++) {
+                                        if (oCost_allowance[a].cust_paycodeID == wagetype && (oCost_allowance[a].cust_Location !== null && oCost_allowance[a].cust_Location == this.completeResponse[j].LocationCode) && (oCost_allowance[a].cust_profitCenter !== null && oCost_allowance[a].cust_profitCenter == this.completeResponse[j].ProfitCenter)) {
+                                            obj.Amount = Number(oCost_allowance[a].cust_Amount) * Number(this.completeResponse[j].TotalHours);
                                             break;
                                         }
-                                        else if (oCost_allowance[i].cust_paycodeID == wagetype && oCost_allowance[i].cust_Location == this.completeResponse[j].LocationCode) {
-                                            obj.Amount = Number(oCost_allowance[i].cust_Amount) * Number(this.completeResponse[j].TotalHours);
+                                        else if (oCost_allowance[a].cust_paycodeID == wagetype && oCost_allowance[a].cust_Location == this.completeResponse[j].LocationCode) {
+                                            obj.Amount = Number(oCost_allowance[a].cust_Amount) * Number(this.completeResponse[j].TotalHours);
                                             break;
                                         }
-                                        else if (oCost_allowance[i].cust_paycodeID == wagetype) {
-                                            obj.Amount = Number(oCost_allowance[i].cust_Amount) * Number(this.completeResponse[j].TotalHours);
+                                        else if (oCost_allowance[a].cust_paycodeID == wagetype) {
+                                            obj.Amount = Number(oCost_allowance[a].cust_Amount) * Number(this.completeResponse[j].TotalHours);
                                             break;
                                         }
                                     }
@@ -1834,7 +1869,7 @@ sap.ui.define([
                                     obj.Number = "";
                                 }
                                 else {
-                                    obj.Number = this.completeResponse[j].TotalHours.replaceAll(":", ".");
+                                    obj.Number = this.completeResponse[j].TotalHoursPercentage; //this.completeResponse[j].TotalHours.replaceAll(":", ".");
                                 }
                                 obj.CostCenter = this.completeResponse[j].CostCenter;
                                 if(obj.CostCenter !== ""){
@@ -1907,12 +1942,12 @@ sap.ui.define([
                     if (xhr.readyState === 4 && xhr.status == 200) {
                         var parseData = JSON.parse(xhr.status);
                         MessageBox.success(that.getResourceBundle().getText("successRecordCPI"));
-                        sap.ui.core.BusyIndicator.hide();
+                        that.getView().byId("listTab").setBusy(false);
                         that.updateStatus(oDataModel, batchArray);
                     }
                     else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
                         MessageBox.error(that.getResourceBundle().getText("errorRecordPosted"));
-                        sap.ui.core.BusyIndicator.hide();
+                        that.getView().byId("listTab").setBusy(false);
                     }
                 }
                 xhr.open('POST', serviceUrl, true);
@@ -1927,17 +1962,17 @@ sap.ui.define([
                         if (oResult.__batchResponses[0].__changeResponses[0].statusCode == '201' || oResult.__batchResponses[0].__changeResponses[0].statusCode == '200') {
                             MessageBox.success(this.getResourceBundle().getText("successRecordPosted"));
                             this.onSearch(); // refresh time sheet details
-                            sap.ui.core.BusyIndicator.hide();
+                            this.getView().byId("listTab").setBusy(false);
                         }
                     } catch (err) { }
                     try {
                         if (oResult.__batchResponses[0].response.statusCode == '400' || oResult.__batchResponses[0].response.statusCode == '405') {
                             MessageBox.error(this.getResourceBundle().getText("errorRecordPosted"));
-                            sap.ui.core.BusyIndicator.hide();
+                            this.getView().byId("listTab").setBusy(false);
                         }
                     } catch (err) { }
                 }.bind(this), function (oError) {
-                    sap.ui.core.BusyIndicator.hide();
+                    that.getView().byId("listTab").setBusy(false);
                     MessageBox.error(this.getResourceBundle().getText("errorBatch"));
                 }.bind(this));
             },

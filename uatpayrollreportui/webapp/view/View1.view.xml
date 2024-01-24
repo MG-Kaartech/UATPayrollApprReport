@@ -209,11 +209,15 @@
             >
                 <headerToolbar>
                     <OverflowToolbar>
+                        <Label id="idTimesheetItems"/>
                         <ToolbarSpacer />
+                        <Button
+                            text="{i18n>rtot}"
+                            press="onCalculateRTOT"
+                        />
                         <Button
                             icon="sap-icon://download-from-cloud"
                             text="{i18n>export}"
-                            type="Ghost"
                             press="onExportTimeData"
                         />
                         <Button

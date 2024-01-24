@@ -24,11 +24,11 @@
                 text="ApproverName: {timePeriod>/timesheetData/0/PayrollApprovalName}"
             />
             <statuses>
-                <ObjectStatus
+                <!--ObjectStatus
                     title="{i18n>appName}"
                     text="{timePeriod>/timesheetData/0/AppName}"
                     state="Information"
-                />
+                /-->
                 <ObjectStatus
                     title="{i18n>status}"
                     text="{ parts: [ {path: 'timePeriod>/timesheetData/0/PayrollApprovalStatus'} ], formatter: '.formatter.PayrollApprStatusName'}"
@@ -69,6 +69,9 @@
                     <columns>
                         <Column width="7.5rem">
                             <Text text="{i18n>date}" />
+                        </Column>
+                        <Column >
+                            <Text text="{i18n>appName}" />
                         </Column>
                         <Column
                             minScreenWidth="phone"
@@ -142,6 +145,10 @@
                                     valueState="{timePeriod>DateValueState}"
                                     editable="{ parts: [ {path:'timePeriod>NewRecord'} ], formatter: '.formatter.SickDateEditable' }"
                                 /><!--editable="{ parts: [ {path: 'timePeriod>PayCode'},{path: 'timePeriod>TotalHours'},{path:'timePeriod>NewRecord'} ], formatter: '.formatter.SickEditable' }"-->
+                                <Input
+                                    value="{timePeriod>AppName}"
+                                    editable="false"
+                                />
                                 <ComboBox
                                     selectedKey="{timePeriod>PayCode}"
                                     tooltip="{timePeriod>PayCode}"
@@ -213,8 +220,9 @@
                                     change="onChangeHours"
                                     value="{timePeriod>TotalHours}"
                                     valueState="{timePeriod>TotalHourslueState}"
-                                    editable="{ parts: [ {path: 'timePeriod>PayCode'},{path: 'timePeriod>TotalHours'} ,{path:'timePeriod>NewRecord'}], formatter: '.formatter.SickEditable' }"
+                                    
                                 />
+                                <!--editable="{ parts: [ {path: 'timePeriod>PayCode'},{path: 'timePeriod>TotalHours'} ,{path:'timePeriod>NewRecord'}], formatter: '.formatter.SickEditable' }"-->
                                 <Input
                                     editable="false"
                                     value="{timePeriod>ManagerApprovalName}"
