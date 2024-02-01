@@ -312,9 +312,15 @@ sap.ui.define([
                     var sendingUnit = new sap.ui.model.Filter({
                         path: "SendingUnitTrailer",
                         operator: sap.ui.model.FilterOperator.EQ,
-                        value1: ""
+                        value1: null
                     });
                     oFilterValues.push(sendingUnit);
+                    var sendingUnit1 = new sap.ui.model.Filter({
+                        path: "SendingUnitTrailer",
+                        operator: sap.ui.model.FilterOperator.EQ,
+                        value1: ""
+                    });
+                    oFilterValues.push(sendingUnit1);
                     return oFilterValues;
                 }
             },
@@ -333,7 +339,7 @@ sap.ui.define([
                     sorters: [
                         new sap.ui.model.Sorter("Date", /*descending*/false) // "Sorter" required from "sap/ui/model/Sorter"
                     ],
-                    urlParameters: { "$select": "Date,EmployeeID,EmployeeName,PayPeriodBeginDate,PayPeriodEndDate,CompanyID,CompanyName,OverTime,RegularTime,TotalHours,TotalHoursPercentage,SaveSubmitStatus,PayrollApprovalStatus,PayrollApprovalName,PayCode,OtThreshold,OtFrequency,AppName,CostCenter,Activity,WorkOrder,Job,Section,Phase,ManagerApprovalName,PayPeriodDescription" },
+                    //urlParameters: { "$select": "Date,EmployeeID,EmployeeName,PayPeriodBeginDate,PayPeriodEndDate,CompanyID,CompanyName,OverTime,RegularTime,TotalHours,TotalHoursPercentage,SaveSubmitStatus,PayrollApprovalStatus,PayrollApprovalName,PayCode,OtThreshold,OtFrequency,AppName,CostCenter,Activity,WorkOrder,Job,Section,Phase,ManagerApprovalName,PayPeriodDescription" },
                     success: function (odata) {
                         this.completeResponse = odata.results;
                         timePeriodPromise.resolve(odata.results);
@@ -1122,8 +1128,10 @@ sap.ui.define([
                 })
                 var oFromDateTimePeriod = oSelectedData.PayPeriodBeginDate;
                 var oEndDateTimePeriod = oSelectedData.PayPeriodEndDate;
-                this.oFromDate = new Date(oFromDateTimePeriod); //yyyy-MM-dd
-                this.oToDate = new Date(oEndDateTimePeriod); // yyyy-MM-dd
+                //this.oFromDate = new Date(oFromDateTimePeriod); //yyyy-MM-dd
+                //this.oToDate = new Date(oEndDateTimePeriod); // yyyy-MM-dd
+                this.oFromDate = new Date((new Date(oFromDateTimePeriod)).toLocaleString("en-US", {timeZone: "Asia/Calcutta"}));
+                this.oToDate = new Date((new Date(oEndDateTimePeriod)).toLocaleString("en-US", {timeZone: "Asia/Calcutta"}));
                 // Filters for Service call
                 var DateRange = new sap.ui.model.Filter({
                     path: "Date",
@@ -1271,7 +1279,7 @@ sap.ui.define([
                     }
                     if (oTableData[idx].ID !== "") {
                         var batchOperation = oDataModel.createBatchOperation("/TimeSheetDetails_prd(ID=" + oTableData[idx].ID + ",AppName='" + oTableData[idx].AppName + "',Date='" + oTableData[idx].Date + "')", "PATCH", oTableData[idx]);
-                        deletePayload.push(batchOperation);
+                        deletePaybatchOperationload.push();
                     }
                     oTableData.splice(idx, 1);
                 }
@@ -1591,7 +1599,11 @@ sap.ui.define([
                         payload.SaveSubmitStatus = timePeriodData[i].SaveSubmitStatus;
                         payload.PayrollApprovalStatus = timePeriodData[i].PayrollApprovalStatus == null ? "" : timePeriodData[i].PayrollApprovalStatus;
                         payload.TotalHours = timePeriodData[i].TotalHours.replaceAll(":", ".");
-                        payload.TotalHoursPercentage = timePeriodData[i].TotalHoursPercentage.replaceAll(":", ".");
+                        try{
+                            payload.TotalHoursPercentage = timePeriodData[i].TotalHoursPercentage.replaceAll(":", ".");
+                        }catch(err){
+                            payload.TotalHoursPercentage = timePeriodData[i].TotalHoursPercentage == undefined ? "" : timePeriodData[i].TotalHoursPercentage;
+                        }
                         payload.Activity = timePeriodData[i].Activity == null ? "" : timePeriodData[i].Activity;
                         payload.SequenceNo = timePeriodData[i].SequenceNo == null ? "" : timePeriodData[i].SequenceNo;
                         payload.UpdateIndicator = timePeriodData[i].UpdateIndicator == null ? "" : timePeriodData[i].UpdateIndicator;
@@ -1779,8 +1791,10 @@ sap.ui.define([
                             else {
                                 payload.LocationCode = this.completeResponse[j].LocationCode;
                             }
-                            payload.OtThreshold = this.Ot_Threshold == null ? "" : this.Ot_Threshold;
-                            payload.OtFrequency = this.Ot_Frequency == null ? "" : this.Ot_Frequency;
+                            payload.OtThreshold = this.completeResponse[j].OtThreshold  == null ? "" : this.completeResponse[j].OtThreshold;
+                            payload.OtFrequency = this.completeResponse[j].OtFrequency == null ? "" : this.completeResponse[j].OtFrequency;
+                           // payload.OtThreshold = this.Ot_Threshold == null ? "" : this.Ot_Threshold;
+                            //payload.OtFrequency = this.Ot_Frequency == null ? "" : this.Ot_Frequency;
                             payload.ManagerApprovalName = this.completeResponse[j].ManagerApprovalName == null ? "" : this.completeResponse[j].ManagerApprovalName;
                             payload.ManagerApprovalEmail = this.completeResponse[j].ManagerApprovalEmail == null ? "" : this.completeResponse[j].ManagerApprovalEmail;
                             payload.PayrollApprovalName = this.completeResponse[j].PayrollApprovalName == null ? "" : this.completeResponse[j].PayrollApprovalName;
