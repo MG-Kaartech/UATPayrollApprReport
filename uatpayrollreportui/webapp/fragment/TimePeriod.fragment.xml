@@ -71,6 +71,9 @@
                             <Text text="{i18n>date}" />
                         </Column>
                         <Column >
+                            <Text text="{i18n>createdAt}" />
+                        </Column>
+                        <Column >
                             <Text text="{i18n>appName}" />
                         </Column>
                         <Column
@@ -145,6 +148,7 @@
                                     valueState="{timePeriod>DateValueState}"
                                     editable="{ parts: [ {path:'timePeriod>NewRecord'} ], formatter: '.formatter.SickDateEditable' }"
                                 /><!--editable="{ parts: [ {path: 'timePeriod>PayCode'},{path: 'timePeriod>TotalHours'},{path:'timePeriod>NewRecord'} ], formatter: '.formatter.SickEditable' }"-->
+                                <Input editable="false" value="{ path: 'timePeriod>createdAt',type: 'sap.ui.model.odata.type.DateTime', constraints: { displayFormat: 'Date'},formatOptions: {pattern: 'yyyy-MM-dd'}}"/>
                                 <Input
                                     value="{timePeriod>AppName}"
                                     editable="false"
