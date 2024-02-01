@@ -1199,7 +1199,7 @@ sap.ui.define([
                 var oRecord = {
                     "AppName": appName, "MinDate": this.oFromDate, "MaxDate": this.oToDate, "Date": "", "PayCode": "", "CostCenter": "", "Activity": "",
                     "WorkOrder": "", "Job": "", "Section": "", "Phase": "", "TotalHours": "", "ManagerApprovalName": this.loginName, "SaveSubmitStatus": "Approved",
-                    "PayrollApprovalStatus": "", "NewRecord": true, "LocationCode": this.Location, "PersonnelSubArea": this.PersonalSubArea
+                    "PayrollApprovalStatus": "", "ManagerApprovalStatus":"", "NewRecord": true, "LocationCode": this.Location, "PersonnelSubArea": this.PersonalSubArea
                 };
                 aTimePeriodModel.timesheetData.push(oRecord);
                 oModel.refresh();
@@ -1441,7 +1441,7 @@ sap.ui.define([
                     return;
                 }
                 this.timeSheetApprove("TimePeriodSave");
-                this._oImportTimePeriodDialog.close();
+               // this._oImportTimePeriodDialog.close();
             },
             onChangeHours: function (oEvent) {
                 // /*oEvent.getSource().getValue());*/
@@ -1527,7 +1527,7 @@ sap.ui.define([
                 if (selectedData.PayrollApprovalStatus == "Executed") {
                     selectedData.UpdateIndicator = "X";
                 }
-                if (selectedData.SaveSubmitStatus == "Approved" && selectedData.ManagerApprovalName !== null && selectedData.ManagerApprovalName !== null) {
+                if (selectedData.NewRecord != true && selectedData.SaveSubmitStatus == "Approved" && selectedData.ManagerApprovalName !== null && selectedData.ManagerApprovalName !== null) {
                     selectedData.UpdateIndicator = "X";
                 }
                 this.getView().getModel("timePeriod").refresh();
@@ -1565,21 +1565,31 @@ sap.ui.define([
                 var dmonth = d.getMonth() + 1;
                 var dday = d.getDate();
                 if (param == "TimePeriodSave") { //time period save
-                    var timePeriodData = this.getView().getModel("timePeriod").getData().timesheetData;
+                    var timesheetData = this.getView().getModel("timePeriod").getData().timesheetData;
+                    var timePeriodData = [];
+                    for(var i=0;i<timesheetData.length;i++){
+                        if(timesheetData[i].UpdateIndicator == "X" || timesheetData[i].NewRecord){
+                            timePeriodData.push(timesheetData[i]);
+                        }
+                    }
+                    if(timePeriodData.length == 0){
+                        MessageBox.information(this.getResourceBundle().getText("everythingIsUptoDate"));
+                        return;
+                    }
                     for (var i = 0; i < timePeriodData.length; i++) {
                         var payload = {};
                         var sfpayload = {};
                         payload.ID = timePeriodData[i].ID;
                         payload.AppName = timePeriodData[i].AppName; //App Name added
                         payload.Date = timePeriodData[i].Date;
-                        payload.EmployeeID = timePeriodData[0].EmployeeID;
-                        payload.EmployeeName = timePeriodData[0].EmployeeName == null ? "" : timePeriodData[0].EmployeeName;
-                        payload.CompanyID = timePeriodData[0].CompanyID;
-                        payload.CompanyName = timePeriodData[0].CompanyName;
-                        payload.PayPeriodBeginDate = timePeriodData[0].PayPeriodBeginDate;
-                        payload.PayPeriodEndDate = timePeriodData[0].PayPeriodEndDate;
-                        payload.PersonnelSubArea = timePeriodData[0].PersonnelSubArea == null ? "" : timePeriodData[0].PersonnelSubArea;
-                        payload.LocationCode = timePeriodData[0].LocationCode == null ? "" : timePeriodData[0].LocationCode;
+                        payload.EmployeeID = timesheetData[0].EmployeeID;
+                        payload.EmployeeName = timesheetData[0].EmployeeName == null ? "" : timesheetData[0].EmployeeName;
+                        payload.CompanyID = timesheetData[0].CompanyID;
+                        payload.CompanyName = timesheetData[0].CompanyName;
+                        payload.PayPeriodBeginDate = timesheetData[0].PayPeriodBeginDate;
+                        payload.PayPeriodEndDate = timesheetData[0].PayPeriodEndDate;
+                        payload.PersonnelSubArea = timesheetData[0].PersonnelSubArea == null ? "" : timesheetData[0].PersonnelSubArea;
+                        payload.LocationCode = timesheetData[0].LocationCode == null ? "" : timesheetData[0].LocationCode;
                         payload.OtThreshold = this.Ot_Threshold == null ? "" : this.Ot_Threshold;
                         payload.OtFrequency = this.Ot_Frequency == null ? "" : this.Ot_Frequency;
                         payload.ManagerApprovalName = timePeriodData[i].ManagerApprovalName == null ? "" : timePeriodData[i].ManagerApprovalName;
@@ -1596,7 +1606,8 @@ sap.ui.define([
                         payload.Phase = timePeriodData[i].Phase == null ? "" : timePeriodData[i].Phase;
                         payload.PhaseDescription = timePeriodData[i].PhaseDescription == null ? "" : timePeriodData[i].PhaseDescription;
                         payload.CostCenter = timePeriodData[i].CostCenter == null ? "" : timePeriodData[i].CostCenter;
-                        payload.SaveSubmitStatus = timePeriodData[i].SaveSubmitStatus;
+                        payload.SaveSubmitStatus = timePeriodData[i].SaveSubmitStatus == null ? "" : timePeriodData[i].SaveSubmitStatus;
+                        payload.ManagerApprovalStatus = timePeriodData[i].ManagerApprovalStatus == null ? "" : timePeriodData[i].ManagerApprovalStatus;
                         payload.PayrollApprovalStatus = timePeriodData[i].PayrollApprovalStatus == null ? "" : timePeriodData[i].PayrollApprovalStatus;
                         payload.TotalHours = timePeriodData[i].TotalHours.replaceAll(":", ".");
                         try{
@@ -1644,8 +1655,8 @@ sap.ui.define([
                         var oRTOTpayload = {};
                         oRTOTpayload.AppName = timePeriodData[i].AppName; //App Name added
                         oRTOTpayload.EmployeeID = timePeriodData[0].EmployeeID;
-                        oRTOTpayload.PayPeriodBeginDate = timePeriodData[0].PayPeriodBeginDate;
-                        oRTOTpayload.PayPeriodEndDate = timePeriodData[0].PayPeriodEndDate;
+                        oRTOTpayload.PayPeriodBeginDate = timesheetData[0].PayPeriodBeginDate;
+                        oRTOTpayload.PayPeriodEndDate = timesheetData[0].PayPeriodEndDate;
                         oRTOTpayload.OtFrequency = this.Ot_Frequency;
                         oRTOTpayload.Date = "";
 
@@ -1667,6 +1678,7 @@ sap.ui.define([
                 oDataModel.submitBatch(function (oResult) {
                     try {
                         if (oResult.__batchResponses[0].__changeResponses[0].statusCode == '201' || oResult.__batchResponses[0].__changeResponses[0].statusCode == '200') {
+                            this._oImportTimePeriodDialog.close();
                             MessageBox.success(this.getResourceBundle().getText("successRecordPosted"));
                             if (sfBatchArray.length > 0) {
                                 oSFDataModel.addBatchChangeOperations(sfBatchArray);
@@ -1767,7 +1779,7 @@ sap.ui.define([
                 for (var i = 0; i < selectedValues.length; i++) {
                     var oSelectedData = this.getView().getModel("payroll").getProperty(selectedValues[i]);
                     for (var j = 0; j < this.completeResponse.length; j++) {
-                        if (oSelectedData.EmployeeID == this.completeResponse[j].EmployeeID && oSelectedData.PayPeriodBeginDate == this.completeResponse[j].PayPeriodBeginDate && oSelectedData.PayPeriodEndDate == this.completeResponse[j].PayPeriodEndDate) {
+                        if (oSelectedData.EmployeeID == this.completeResponse[j].EmployeeID && oSelectedData.PayPeriodBeginDate == this.completeResponse[j].PayPeriodBeginDate && oSelectedData.PayPeriodEndDate == this.completeResponse[j].PayPeriodEndDate && this.completeResponse[j].SaveSubmitStatus !="Approved") {
                             // payload for timesheet details update call for payroll status
                             var payload = {};
                             payload.ID = this.completeResponse[j].ID;
@@ -1810,6 +1822,7 @@ sap.ui.define([
                             payload.PhaseDescription = this.completeResponse[j].PhaseDescription == null ? "" : this.completeResponse[j].PhaseDescription;
                             payload.CostCenter = this.completeResponse[j].CostCenter == null ? "" : this.completeResponse[j].CostCenter;
                             payload.SaveSubmitStatus = "Approved";
+                            payload.ManagerApprovalStatus = "Approved";
                             payload.PayrollApprovalStatus = this.completeResponse[j].PayrollApprovalStatus == null ? "" : this.completeResponse[j].PayrollApprovalStatus;
                             payload.TotalHours = this.completeResponse[j].TotalHours.replaceAll(":", ".");
                             payload.TotalHoursPercentage = this.completeResponse[j].TotalHoursPercentage == null ? "" : this.completeResponse[j].TotalHoursPercentage;
@@ -1971,6 +1984,7 @@ sap.ui.define([
                             payload.PayPeriodBeginDate = this.completeResponse[j].PayPeriodBeginDate;
                             payload.PayPeriodEndDate = this.completeResponse[j].PayPeriodEndDate;
                             payload.PayrollApprovalStatus = "Executed";
+                            payload.ManagerApprovalStatus = "Approved";
                             if (this.completeResponse[j].SaveSubmitStatus != "Approved") {
                                 payload.SaveSubmitStatus = "Approved";
                                 payload.ManagerApprovalName = this.loginName;
