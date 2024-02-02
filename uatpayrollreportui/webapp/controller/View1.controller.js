@@ -1279,7 +1279,7 @@ sap.ui.define([
                     }
                     if (oTableData[idx].ID !== "") {
                         var batchOperation = oDataModel.createBatchOperation("/TimeSheetDetails_prd(ID=" + oTableData[idx].ID + ",AppName='" + oTableData[idx].AppName + "',Date='" + oTableData[idx].Date + "')", "PATCH", oTableData[idx]);
-                        deletePaybatchOperationload.push();
+                        deletePayload.push(batchOperation);
                     }
                     oTableData.splice(idx, 1);
                 }
@@ -1568,7 +1568,7 @@ sap.ui.define([
                     var timesheetData = this.getView().getModel("timePeriod").getData().timesheetData;
                     var timePeriodData = [];
                     for(var i=0;i<timesheetData.length;i++){
-                        if(timesheetData[i].UpdateIndicator == "X" || timesheetData[i].NewRecord){
+                        if(timesheetData[i].UpdateIndicator == "X" || timesheetData[i].NewRecord || timesheetData[i].SaveSubmitStatus!=="Approved"){
                             timePeriodData.push(timesheetData[i]);
                         }
                     }
