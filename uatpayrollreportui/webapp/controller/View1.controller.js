@@ -131,12 +131,22 @@ sap.ui.define([
                     success: function (e) {
                         // that.loginName = e.firstname;
                         //that.logedinEmail = e.email;
+                        that.eableAdmin(e.scopes);
                         that.getUserDetails(e.firstname);
                     },
                     error: function (e) {
                         MessageBox.error(that.getResourceBundle().getText("errorUser"));
                     }
                 });
+            },
+            eableAdmin: function (scopes) {
+                var that = this;
+                this.admin = false;
+                scopes.forEach(oItem => {
+                    if (oItem.includes("PayrollAdministrator")) {
+                        that.admin = true;
+                    }
+                })
             },
             getUserDetails: function (empNo) {
                 // get employee details from Employees table
@@ -1130,8 +1140,8 @@ sap.ui.define([
                 var oEndDateTimePeriod = oSelectedData.PayPeriodEndDate;
                 //this.oFromDate = new Date(oFromDateTimePeriod); //yyyy-MM-dd
                 //this.oToDate = new Date(oEndDateTimePeriod); // yyyy-MM-dd
-                this.oFromDate = new Date((new Date(oFromDateTimePeriod)).toLocaleString("en-US", {timeZone: "Asia/Calcutta"}));
-                this.oToDate = new Date((new Date(oEndDateTimePeriod)).toLocaleString("en-US", {timeZone: "Asia/Calcutta"}));
+                this.oFromDate = new Date((new Date(oFromDateTimePeriod)).toLocaleString("en-US", { timeZone: "Asia/Calcutta" }));
+                this.oToDate = new Date((new Date(oEndDateTimePeriod)).toLocaleString("en-US", { timeZone: "Asia/Calcutta" }));
                 // Filters for Service call
                 var DateRange = new sap.ui.model.Filter({
                     path: "Date",
@@ -1186,6 +1196,10 @@ sap.ui.define([
             //add record to the timeperiod table
             onAddTimePeriod: function () {
                 var oModel = this.getView().getModel("timePeriod");
+                if (this.admin == false) {
+                    MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
+                    return;
+                }
                 var aTimePeriodModel = oModel.getData();
                 this.timePeriod = aTimePeriodModel.timesheetData.timeperiod;
                 try {
@@ -1199,7 +1213,7 @@ sap.ui.define([
                 var oRecord = {
                     "AppName": appName, "MinDate": this.oFromDate, "MaxDate": this.oToDate, "Date": "", "PayCode": "", "CostCenter": "", "Activity": "",
                     "WorkOrder": "", "Job": "", "Section": "", "Phase": "", "TotalHours": "", "ManagerApprovalName": this.loginName, "SaveSubmitStatus": "Approved",
-                    "PayrollApprovalStatus": "", "ManagerApprovalStatus":"Approved", "NewRecord": true, "LocationCode": this.Location, "PersonnelSubArea": this.PersonalSubArea
+                    "PayrollApprovalStatus": "", "ManagerApprovalStatus": "Approved", "NewRecord": true, "LocationCode": this.Location, "PersonnelSubArea": this.PersonalSubArea
                 };
                 aTimePeriodModel.timesheetData.push(oRecord);
                 oModel.refresh();
@@ -1207,6 +1221,10 @@ sap.ui.define([
             // delete record from timeperiod table
             onDeleteTimePeriod: function () {
                 var sfpayload = {};
+                if (this.admin == false) {
+                    MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
+                    return;
+                }
                 var sfModel = this.getOwnerComponent().getModel("v2");
                 var oSFDataModel = new sap.ui.model.odata.ODataModel(sfModel.sServiceUrl);
                 var valueHelpData = this.getView().getModel("valueHelp").getData();
@@ -1386,6 +1404,10 @@ sap.ui.define([
                 var oModelData = this.getView().getModel("timePeriod").getData().timesheetData;
                 var sickLeave = 0;
                 var vacationLeave = 0;
+                if (this.admin == false) {
+                    MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
+                    return;
+                }
                 sap.ui.getCore().byId("idSave").setEnabled(true);
                 for (var i = 0; i < oModelData.length; i++) {
                     if (oModelData[i].Date == "") {
@@ -1441,7 +1463,7 @@ sap.ui.define([
                     return;
                 }
                 this.timeSheetApprove("TimePeriodSave");
-               // this._oImportTimePeriodDialog.close();
+                // this._oImportTimePeriodDialog.close();
             },
             onChangeHours: function (oEvent) {
                 // /*oEvent.getSource().getValue());*/
@@ -1567,12 +1589,12 @@ sap.ui.define([
                 if (param == "TimePeriodSave") { //time period save
                     var timesheetData = this.getView().getModel("timePeriod").getData().timesheetData;
                     var timePeriodData = [];
-                    for(var i=0;i<timesheetData.length;i++){
-                        if(timesheetData[i].UpdateIndicator == "X" || timesheetData[i].NewRecord || timesheetData[i].SaveSubmitStatus!=="Approved"){
+                    for (var i = 0; i < timesheetData.length; i++) {
+                        if (timesheetData[i].UpdateIndicator == "X" || timesheetData[i].NewRecord == true || timesheetData[i].SaveSubmitStatus !== "Approved") {
                             timePeriodData.push(timesheetData[i]);
                         }
                     }
-                    if(timePeriodData.length == 0){
+                    if (timePeriodData.length == 0) {
                         MessageBox.information(this.getResourceBundle().getText("everythingIsUptoDate"));
                         return;
                     }
@@ -1610,9 +1632,9 @@ sap.ui.define([
                         payload.ManagerApprovalStatus = timePeriodData[i].ManagerApprovalStatus == null ? "" : timePeriodData[i].ManagerApprovalStatus;
                         payload.PayrollApprovalStatus = timePeriodData[i].PayrollApprovalStatus == null ? "" : timePeriodData[i].PayrollApprovalStatus;
                         payload.TotalHours = timePeriodData[i].TotalHours.replaceAll(":", ".");
-                        try{
+                        try {
                             payload.TotalHoursPercentage = timePeriodData[i].TotalHoursPercentage.replaceAll(":", ".");
-                        }catch(err){
+                        } catch (err) {
                             payload.TotalHoursPercentage = timePeriodData[i].TotalHoursPercentage == undefined ? "" : timePeriodData[i].TotalHoursPercentage;
                         }
                         payload.Activity = timePeriodData[i].Activity == null ? "" : timePeriodData[i].Activity;
@@ -1770,6 +1792,10 @@ sap.ui.define([
                 var batchArray = [];
                 var oModel = this.getOwnerComponent().getModel();
                 var oDataModel = new sap.ui.model.odata.ODataModel(oModel.sServiceUrl);
+                if (this.admin == false) {
+                    MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
+                    return;
+                }
                 var selectedValues = this.getView().byId("listTab").getSelectedContextPaths();
                 if (selectedValues.length == 0) {
                     MessageBox.error(this.getResourceBundle().getText("errorAtleatOneRecord"));
@@ -1779,7 +1805,7 @@ sap.ui.define([
                 for (var i = 0; i < selectedValues.length; i++) {
                     var oSelectedData = this.getView().getModel("payroll").getProperty(selectedValues[i]);
                     for (var j = 0; j < this.completeResponse.length; j++) {
-                        if (oSelectedData.EmployeeID == this.completeResponse[j].EmployeeID && oSelectedData.PayPeriodBeginDate == this.completeResponse[j].PayPeriodBeginDate && oSelectedData.PayPeriodEndDate == this.completeResponse[j].PayPeriodEndDate && this.completeResponse[j].SaveSubmitStatus !="Approved") {
+                        if (oSelectedData.EmployeeID == this.completeResponse[j].EmployeeID && oSelectedData.PayPeriodBeginDate == this.completeResponse[j].PayPeriodBeginDate && oSelectedData.PayPeriodEndDate == this.completeResponse[j].PayPeriodEndDate && this.completeResponse[j].SaveSubmitStatus != "Approved") {
                             // payload for timesheet details update call for payroll status
                             var payload = {};
                             payload.ID = this.completeResponse[j].ID;
@@ -1803,9 +1829,9 @@ sap.ui.define([
                             else {
                                 payload.LocationCode = this.completeResponse[j].LocationCode;
                             }
-                            payload.OtThreshold = this.completeResponse[j].OtThreshold  == null ? "" : this.completeResponse[j].OtThreshold;
+                            payload.OtThreshold = this.completeResponse[j].OtThreshold == null ? "" : this.completeResponse[j].OtThreshold;
                             payload.OtFrequency = this.completeResponse[j].OtFrequency == null ? "" : this.completeResponse[j].OtFrequency;
-                           // payload.OtThreshold = this.Ot_Threshold == null ? "" : this.Ot_Threshold;
+                            // payload.OtThreshold = this.Ot_Threshold == null ? "" : this.Ot_Threshold;
                             //payload.OtFrequency = this.Ot_Frequency == null ? "" : this.Ot_Frequency;
                             payload.ManagerApprovalName = this.completeResponse[j].ManagerApprovalName == null ? "" : this.completeResponse[j].ManagerApprovalName;
                             payload.ManagerApprovalEmail = this.completeResponse[j].ManagerApprovalEmail == null ? "" : this.completeResponse[j].ManagerApprovalEmail;
@@ -1842,12 +1868,54 @@ sap.ui.define([
                 }
                 this.updateStatus(oDataModel, batchArray);
             },
+            onDateFieldChange: function () {
+                var startDate = this.getView().byId("idStartDate").getValue();
+                var endDate = this.getView().byId("idFinishDate").getValue();
+                if (startDate != "" && endDate !== "") {
+                    this.getView().byId("idVacationAccural").setEnabled(true);
+                }
+                else {
+                    this.getView().byId("idVacationAccural").setEnabled(false);
+                }
+            },
+            onCalculateVacationAccrual: function () {
+                var that = this;
+                if (this.admin == false) {
+                    MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
+                    return;
+                }
+                var startDate = this.getView().byId("idStartDate").getValue();
+                var endDate = this.getView().byId("idFinishDate").getValue();
+                var serviceUrl = this.getCompleteURL() + "/http/Accrual_PRD";
+                var xhr = new XMLHttpRequest();
+                sap.ui.core.BusyIndicator.show(-1);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status == 200) {
+                        var parseData = JSON.parse(xhr.status);
+                        MessageBox.success(that.getResourceBundle().getText("successVacationAccural"));
+                        sap.ui.core.BusyIndicator.hide();
+                    }
+                    else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
+                        MessageBox.error(that.getResourceBundle().getText("errorVacationAccural"));
+                        sap.ui.core.BusyIndicator.hide();
+                    }
+                }
+                xhr.open('POST', serviceUrl, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.setRequestHeader("beginDate", startDate);
+                xhr.setRequestHeader("endDate", endDate);
+                xhr.send();
+            },
             // approve record(s) and send it to CPI
             onPressApproveCPI: function (approve) {
                 var that = this;
                 var oModel = this.getOwnerComponent().getModel();
                 var oDataModel = new sap.ui.model.odata.ODataModel(oModel.sServiceUrl);
                 var batchArray = [];
+                if (this.admin == false) {
+                    MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
+                    return;
+                }
                 var selectedValues = this.getView().byId("listTab").getSelectedContextPaths();
                 if (selectedValues.length == 0) {
                     MessageBox.error(this.getResourceBundle().getText("errorAtleatOneRecord"));
@@ -1867,7 +1935,7 @@ sap.ui.define([
                 for (var i = 0; i < selectedValues.length; i++) {
                     var oSelectedData = this.getView().getModel("payroll").getProperty(selectedValues[i]);
                     for (var j = 0; j < this.completeResponse.length; j++) {
-                        if (oSelectedData.EmployeeID == this.completeResponse[j].EmployeeID && oSelectedData.PayPeriodBeginDate == this.completeResponse[j].PayPeriodBeginDate && oSelectedData.PayPeriodEndDate == this.completeResponse[j].PayPeriodEndDate && oSelectedData.SaveSubmitStatus !="Rejected") {
+                        if (oSelectedData.EmployeeID == this.completeResponse[j].EmployeeID && oSelectedData.PayPeriodBeginDate == this.completeResponse[j].PayPeriodBeginDate && oSelectedData.PayPeriodEndDate == this.completeResponse[j].PayPeriodEndDate && oSelectedData.SaveSubmitStatus != "Rejected") {
                             let date = this.completeResponse[j].Date;
                             let wagetype = this.completeResponse[j].PayCode == null ? "" : this.completeResponse[j].PayCode;
                             if (wagetype !== "0001" && wagetype !== "0002") {
@@ -1934,18 +2002,25 @@ sap.ui.define([
                                 else {
                                     obj.Number = this.completeResponse[j].TotalHoursPercentage; //this.completeResponse[j].TotalHours.replaceAll(":", ".");
                                 }
-                                obj.CostCenter = this.completeResponse[j].CostCenter;
-                                if (obj.CostCenter !== "") {
-                                    obj.CompanyCodeCostCenter = this.completeResponse[j].CompanyID;
-                                }
-                                else {
+                                // for DD and CREW we should send CostCenter,CompanyCodeCostCenter as empty
+                                if (this.completeResponse[j].AppName == "DD" || this.completeResponse[j].AppName == "CP_CREW") {
+                                    obj.CostCenter = "";
                                     obj.CompanyCodeCostCenter = "";
                                 }
-                                // let job = this.completeResponse[j].Job == null ? "" : this.completeResponse[j].Job;
+                                else {
+                                    obj.CostCenter = this.completeResponse[j].CostCenter;
+                                    if (obj.CostCenter !== "") {
+                                        obj.CompanyCodeCostCenter = this.completeResponse[j].CompanyID;
+                                    }
+                                    else {
+                                        obj.CompanyCodeCostCenter = "";
+                                    }
+                                }
+
+                                //let job = this.completeResponse[j].Job == null ? "" : this.completeResponse[j].Job;
                                 //let section = this.completeResponse[j].Section == null ? "" : this.completeResponse[j].Section;
                                 let phase = this.completeResponse[j].Phase == null ? "" : this.completeResponse[j].Phase;
                                 let wbs = "";
-                                obj.Posid = "";
                                 /* if (job == "" || section == "" || phase == "") {
                                      wbs = "";
                                  }
@@ -1958,7 +2033,13 @@ sap.ui.define([
                                  else if (job != "") {
                                      wbs = job;
                                  }*/
-                                obj.WBS = phase;// RT/OT payload condition
+                                //obj.WBS = phase; 
+                                // for paycode 1230,1070,1225 we need to send Phase id value for Posid
+                                if (obj.WageType == "1230" || obj.WageType == "1070" || obj.WageType == "1225") {
+                                    obj.Posid = phase;
+                                } else {
+                                    obj.Posid = "";
+                                }
                                 if (Number(this.completeResponse[j].OverTime) != 0) {
                                     obj.WageType = "1090";
                                     obj.Number = this.completeResponse[j].OverTime;
@@ -2063,18 +2144,18 @@ sap.ui.define([
                 var sEndDateVal = this.getView().byId("idFinishDate").getValue();
                 if (sBeginDateVal !== "" || sEndDateVal !== "") {
                     for (var i = 0; i < this.completeResponse.length; i++) {
-                        if (sBeginDateVal <= this.completeResponse[i].Date && sEndDateVal >= this.completeResponse[i].Date && this.completeResponse[i].SaveSubmitStatus !="Rejected") {
+                        if (sBeginDateVal <= this.completeResponse[i].Date && sEndDateVal >= this.completeResponse[i].Date && this.completeResponse[i].SaveSubmitStatus != "Rejected") {
                             ExportData.push(this.completeResponse[i]);
                         }
                     }
                 } else {
                     for (var i = 0; i < this.completeResponse.length; i++) {
-                        if (this.completeResponse[i].SaveSubmitStatus !="Rejected") {
+                        if (this.completeResponse[i].SaveSubmitStatus != "Rejected") {
                             ExportData.push(this.completeResponse[i]);
                         }
                     }
                 }
-                if(ExportData.length == 0){
+                if (ExportData.length == 0) {
                     MessageBox.information(this.getResourceBundle().getText("noData"));
                     return;
                 }

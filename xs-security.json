@@ -1,20 +1,60 @@
 {
   "xsappname": "uatpayrollreport",
   "tenant-mode": "dedicated",
-  "description": "Security profile of called application",
   "scopes": [
-    {
-      "name": "uaa.user",
-      "description": "UAA"
-    }
+      {
+          "name": "$XSAPPNAME.PayrollAdministrator",
+          "description": "Administrate the application"
+      },
+      {
+          "name": "$XSAPPNAME.PayrollUser",
+          "description": "Use the application"
+      },
+      {
+          "name": "uaa.user",
+          "description": "UAA"
+      }
   ],
   "role-templates": [
-    {
-      "name": "Token_Exchange",
-      "description": "UAA",
-      "scope-references": [
-        "uaa.user"
-      ]
-    }
+      {
+          "name": "Token_Exchange",
+          "description": "UAA",
+          "scope-references": [
+              "uaa.user"
+          ]
+      },
+      {
+          "name": "PayrollAdministrator",
+          "description": "PayrollAdministrator",
+          "scope-references": [
+              "uaa.user",
+              "$XSAPPNAME.PayrollAdministrator"
+          ]
+      },
+      {
+          "name": "PayrollUser",
+          "description": "PayrollUser",
+          "scope-references": [
+              "uaa.user",
+              "$XSAPPNAME.PayrollUser"
+          ]
+      }
+  ],
+  "role-collections": [
+      {
+          "name": "Payroll_Administrator",
+          "description": "Payroll Administrator",
+          "role-template-references": [
+              "$XSAPPNAME.PayrollAdministrator",
+              "$XSAPPNAME.PayrollUser"
+          ]
+      },
+      {
+          "name": "Payroll_User",
+          "description": "Payroll User",
+          "role-template-references": [
+              "$XSAPPNAME.PayrollUser"
+          ]
+      }
   ]
 }

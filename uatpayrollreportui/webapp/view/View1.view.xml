@@ -140,6 +140,7 @@
                             valueFormat="yyyy-MM-dd"
                             displayFormat="yyyy-MM-dd"
                             placeholder="{i18n>startDate}"
+                            change="onDateFieldChange"
                         />
                     </fb:control>
                 </fb:FilterGroupItem>
@@ -155,6 +156,7 @@
                             valueFormat="yyyy-MM-dd"
                             displayFormat="yyyy-MM-dd"
                             placeholder="{i18n>finishDate}"
+                            change="onDateFieldChange"
                         />
                     </fb:control>
                 </fb:FilterGroupItem>
@@ -211,6 +213,10 @@
                     <OverflowToolbar>
                         <Label id="idTimesheetItems"/>
                         <ToolbarSpacer />
+                        <Button id="idVacationAccural" enabled="false"
+                            text="{i18n>vacAccr}"
+                            press="onCalculateVacationAccrual"
+                        />
                         <Button
                             text="{i18n>rtot}"
                             press="onCalculateRTOT"
@@ -324,7 +330,7 @@
                     press="onPressApproveCPI"
                     class="sapUiSmallMarginBeginEnd"
                 />
-                <Button
+                <Button visible="false"
                     type="Negative"
                     text="{i18n>cancel}"
                     press="onCrtDialogClose"
