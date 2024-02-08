@@ -1064,6 +1064,15 @@ sap.ui.define([
                         return emp.PersonnelSubArea;
                     }
                 });
+                // payroll ran changes
+                var payrollrun = "";
+                var payperioddata = this.getView().getModel("valueHelp").getData().payperiod;
+                for(var a=0;a<payperioddata.length;a++){
+                    if((oSelectedData.PayPeriodBeginDate == payperioddata[a].cust_MGCPayPeriodBeginDate) && (oSelectedData.PayPeriodEndDate == payperioddata[a].cust_MGCPayPeriodEndDate)){
+                        payrollrun = payperioddata[a].cust_PayrollRan == null ? "" : payperioddata[a].cust_PayrollRan;
+                        this.getView().getModel("valueHelp").setProperty("/payrollrun", payrollrun);
+                    }
+                }
                 //load timeperiod fragment
                 if (!this._oImportTimePeriodDialog) {
                     Fragment.load({
@@ -1196,6 +1205,11 @@ sap.ui.define([
             //add record to the timeperiod table
             onAddTimePeriod: function () {
                 var oModel = this.getView().getModel("timePeriod");
+                var payrollrun = this.getView().getModel("valueHelp").getData().payrollrun;
+                if(payrollrun == "Y"){
+                    MessageBox.information(this.getResourceBundle().getText("infoPayrollRan"));
+                    return;
+                }
                 if (this.admin == false) {
                     MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
                     return;
@@ -1221,6 +1235,11 @@ sap.ui.define([
             // delete record from timeperiod table
             onDeleteTimePeriod: function () {
                 var sfpayload = {};
+                var payrollrun = this.getView().getModel("valueHelp").getData().payrollrun;
+                if(payrollrun == "Y"){
+                    MessageBox.information(this.getResourceBundle().getText("infoPayrollRan"));
+                    return;
+                }
                 if (this.admin == false) {
                     MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
                     return;
@@ -1404,6 +1423,11 @@ sap.ui.define([
                 var oModelData = this.getView().getModel("timePeriod").getData().timesheetData;
                 var sickLeave = 0;
                 var vacationLeave = 0;
+                var payrollrun = this.getView().getModel("valueHelp").getData().payrollrun;
+                if(payrollrun == "Y"){
+                    MessageBox.information(this.getResourceBundle().getText("infoPayrollRan"));
+                    return;
+                }
                 if (this.admin == false) {
                     MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
                     return;
@@ -1866,6 +1890,11 @@ sap.ui.define([
                         }
                     }
                 }
+                if(batchArray.length == 0){
+                    MessageBox.information(this.getResourceBundle().getText("everythingIsUptoDateForApprove"));
+                    this.getView().byId("listTab").setBusy(false);
+                    return;
+                }
                 this.updateStatus(oDataModel, batchArray);
             },
             onDateFieldChange: function () {
@@ -1912,6 +1941,7 @@ sap.ui.define([
                 var oModel = this.getOwnerComponent().getModel();
                 var oDataModel = new sap.ui.model.odata.ODataModel(oModel.sServiceUrl);
                 var batchArray = [];
+                
                 if (this.admin == false) {
                     MessageBox.information(this.getResourceBundle().getText("infoAuthorization"));
                     return;
