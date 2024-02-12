@@ -1283,6 +1283,7 @@ sap.ui.define([
                     var path = sItems[i].getBindingContextPath();
                     var idx = parseInt(path.substring(path.lastIndexOf('/') + 1), 10);
                     oTableData[idx].DELETED = true;
+                    oTableData[idx].TotalHours = oTableData[idx].TotalHours.replaceAll(":",".");
                     // RT OT caluculation
                     var oRTOTpayload = {};
                     oRTOTpayload.AppName = oTableData[idx].AppName; // App Name added
