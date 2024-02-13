@@ -1226,7 +1226,7 @@ sap.ui.define([
                 }
                 var oRecord = {
                     "AppName": appName, "MinDate": this.oFromDate, "MaxDate": this.oToDate, "Date": "", "PayCode": "", "CostCenter": "", "Activity": "",
-                    "WorkOrder": "", "Job": "", "Section": "", "Phase": "", "TotalHours": "", "ManagerApprovalName": this.loginName, "SaveSubmitStatus": "",
+                    "WorkOrder": "", "Job": "", "Section": "", "Phase": "", "TotalHours": "", "ManagerApprovalName": this.loginName, "SaveSubmitStatus": "Saved",
                     "PayrollApprovalStatus": "", "ManagerApprovalStatus": "", "NewRecord": true, "LocationCode": this.Location, "PersonnelSubArea": this.PersonalSubArea
                 };
                 aTimePeriodModel.timesheetData.push(oRecord);
