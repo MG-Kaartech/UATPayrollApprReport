@@ -278,7 +278,15 @@ sap.ui.define([
                             value1: TimesheetStatusSelection
                         });
                         oFilterValues.push(selectedTimeSheetStatus);
+                        
                     }
+                    // rejected records not required
+                    var RejectedTimeSheetStatus = new sap.ui.model.Filter({
+                        path: "SaveSubmitStatus",
+                        operator: sap.ui.model.FilterOperator.NE,
+                        value1: "Rejected"
+                    });
+                    oFilterValues.push(RejectedTimeSheetStatus);
                     // filter for payroll status
                     var PayrollStatusSelection = this.getView().byId("idPayrollStatus").getValue();
                     if (PayrollStatusSelection != "") {
@@ -2180,11 +2188,12 @@ sap.ui.define([
                         }
                     }
                 } else {
-                    for (var i = 0; i < this.completeResponse.length; i++) {
+                    /*for (var i = 0; i < this.completeResponse.length; i++) {
                         if (this.completeResponse[i].SaveSubmitStatus != "Rejected") {
                             ExportData.push(this.completeResponse[i]);
                         }
-                    }
+                    }*/
+                    ExportData = this.completeResponse;
                 }
                 if (ExportData.length == 0) {
                     MessageBox.information(this.getResourceBundle().getText("noData"));
