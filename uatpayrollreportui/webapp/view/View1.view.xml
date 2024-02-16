@@ -213,7 +213,7 @@
                     <OverflowToolbar>
                         <Label id="idTimesheetItems"/>
                         <ToolbarSpacer />
-                        <Button id="idVacationAccural" enabled="false"
+                        <Button id="idVacationAccural" enabled="false" visible="false"
                             text="{i18n>vacAccr}"
                             press="onCalculateVacationAccrual"
                         />
